@@ -537,24 +537,39 @@ def main():
         tl["finish"] = round(tl["finish"] * a.speed, 2)
     out = (Path(a.out) if a.out else Path.cwd() / "out" / sbp.stem).resolve()
     out.mkdir(parents=True, exist_ok=True)
+    import re
+    import shutil
+    rel_imgs = sorted(set(re.findall(r'href="(?!https?:|data:|#|/)([^"]+\.(?:jpg|jpeg|png|gif))"', article)))
+    if sbp.parent.resolve() != out:  # 图片跟着拷进输出目录：out/ 整个拷走也能打开
+        for n in rel_imgs:
+            src_img = sbp.parent / n
+            if not src_img.exists():
+                sys.exit(f"找不到图片：{src_img}（分镜里的路径相对分镜所在目录写）")
+            (out / n).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src_img, out / n)
     (out / "long.svg").write_text(long_svg, encoding="utf-8")
     (out / "article.html").write_text(article, encoding="utf-8")
     title = sb.get("title", sb["headline"])
-    prev = wxsvg.PREVIEW.format(title=escape(title), article=article.replace("</template", "<\\/template"))
-    if sbp.parent.resolve() != out:  # 图片路径相对分镜目录写的：预览页指回那里
-        prev = prev.replace("<head>", f'<head><base href="{sbp.parent.resolve().as_uri()}/">', 1)
-    (out / "preview.html").write_text(prev, encoding="utf-8")
+    (out / "preview.html").write_text(wxsvg.PREVIEW.format(title=escape(title), article=article.replace("</template", "<\\/template")),
+                                      encoding="utf-8")
     # 封面：第 2 站拼好时截一条
+    custom_cover = sb.get("cover")  # 分镜里写 "cover": "my_cover.jpg"（相对分镜目录）就用它，不自动截
     k = min(1, len(tl["stops"]) - 1)
     cy = tl["stops"][k].get("y", HEAD + 300 + k * GAP)
     try:
-        cover(long_svg, tl["stops"][k]["start"] + 2.6 * a.speed, cy - 40, out / "cover.jpg", base=sbp.parent)
+        if custom_cover:
+            shutil.copy2(sbp.parent / custom_cover, out / "cover.jpg")
+        else:
+            cover(long_svg, tl["stops"][k]["start"] + 2.6 * a.speed, cy - 40, out / "cover.jpg", base=out)
     except Exception as e:  # 常见：没跑 python3 -m playwright install chromium
         print(f"⚠️ 封面没出成（{str(e).splitlines()[0][:80]}）。文章照常生成；要封面先跑 python3 -m playwright install chromium")
     kb = len(article.encode()) / 1024
     tl["article_kb"] = round(kb, 1)
+    # finish = 最后一站开始讲完；end = 整篇（含画廊、猜答案、落版）最后一个动画结束的秒数，自检截「全部画完」用 end
+    ends = [float(b) + float(d) for b, d in re.findall(r'begin="([\d.]+)s"[^>]*?dur="([\d.]+)s"', long_svg)]
+    tl["end"] = round(max(ends + [tl["finish"]]), 2)
     (out / "timeline.json").write_text(json.dumps(tl, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"✅ {out}  {len(tl['stops'])} 站 · {tl['finish']:.1f}s · 高 {tl['height']} · {kb:.0f}KB")
+    print(f"✅ {out}  {len(tl['stops'])} 站 · {tl['finish']:.1f}s（全部画完 {tl['end']:.1f}s）· 高 {tl['height']} · {kb:.0f}KB")
     for s in tl["stops"]:
         print(f"  {s['start']:6.2f}s  {s['title']}")
     if kb > 1000:
@@ -565,7 +580,7 @@ def main():
         # 正文里的本地图（href="xx/yy.jpg"）→ 先传 mmbiz 再换链接，缓存在作品目录 mmbiz.json
         rel = sorted(set(re.findall(r'href="(?!https?:|data:|#)([^"]+\.(?:jpg|jpeg|png|gif))"', article)))
         if rel:
-            base = sbp.parent.resolve()
+            base = out
             cache_p = out / "mmbiz.json"
             cache = json.loads(cache_p.read_text()) if cache_p.exists() else {}
             tok = wechat.token()

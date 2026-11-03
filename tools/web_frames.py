@@ -93,6 +93,13 @@ async def capture(cfg, out):
         if cfg.get("hide_others", True):
             print("  隐藏其它元素:", await pg.evaluate(HIDE_JS, el))
         target = pg.locator(el).first if el else None
+        if target:
+            bb = await target.bounding_box()
+            n_canvas = await pg.evaluate("document.querySelectorAll('canvas').length")
+            print(f"  element {el}: {int(bb['width'])}×{int(bb['height'])}（页面上共 {n_canvas} 个 canvas）" if bb else f"  ⚠️ element {el} 没找到")
+            if bb and (bb["width"] < 300 or bb["height"] < 300):
+                print("  ⚠️ 这个元素太小，多半选错了（three.js 页面常有一个 80×48 的 Stats FPS 小画布）。"
+                      "换成 3D 画布，例如 \"#container > canvas:last-child\"")
         transparent = cfg.get("transparent", True)
         t0 = time.time()
 

@@ -178,6 +178,7 @@ def _say(b, text, x, y, at):
     if not text:
         return
     hs = 74
+    x += 30  # 往图里收一点：站点整体放大 1.25 倍，左边的站头像会被挤出画面
     b.parts.append(appear(head(x + hs / 2 - 6, y + hs / 2 - 34, hs, at, boing=False, step=0.16), at, 0.3))
     bub, _, _ = bubble(x + hs + 8, y - 50, text, at + 0.2, size=17, maxw=300)
     b.parts.append(bub)

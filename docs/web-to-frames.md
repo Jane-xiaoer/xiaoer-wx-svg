@@ -15,7 +15,9 @@
 5. **写分镜**：从 `等轴测-小耳FM洗衣房.json` 复制改，`"assets": "素材文件夹名"`，帧路径写相对路径。
 6. **生成、自检**：`python3 iso/iso_journey.py 分镜.json --grow --speed 0.8`，再用 `tools/frames.py` 截几屏看。
 
-完整配置样例：`tools/examples/小耳FM-洗衣机.json`（真能跑，拍的是线上网站）。
+完整配置样例（都能直接跑，拍的是线上网站）：
+- `tools/examples/小耳FM-洗衣机.json`：点按钮触发动画、实时连拍、`probe` 记状态。
+- `tools/examples/threejs-小东京-按时刻截.json`：WebGL 背景改透明、`AnimationMixer` 跳到指定时刻再截（这份是 DeepSeek 第一次用这个仓库时自己写出来的）。
 
 ## 第 1 步：看懂网站
 
@@ -30,9 +32,10 @@ grep -n "window\.__\|window\.[a-zA-Z]* *=" /tmp/site.html | head             # �
 
 | 要找的 | 为什么 | 找不到怎么办 |
 |---|---|---|
-| 画布元素（`<canvas>` 或包着它的 div） | `element`：只截它，别的网页元素藏掉 | 不填 `element`，截整个视口（就没法透明底了） |
+| 画布元素（`<canvas>` 或包着它的 div） | `element`：只截它，别的网页元素藏掉 | 不填 `element`，截整个视口（就没法透明底了）。页面常有好几个 canvas（three.js 示例自带 80×48 的 Stats FPS 小窗），别直接写 `"canvas"`；capture 会打印元素尺寸，太小会提示 |
 | 相机 + 控制器变量 | 锁等轴测视角 | 用 `patch` 在源码里加一句 `window.__cam=camera; window.__ctl=controls;` |
 | 触发动画的函数或按钮 | 一步步「开门 → 放东西 → 开始」 | 用 `{"js": "document.querySelector('按钮').click()"}` 模拟点击 |
+| 动画播放器（three.js 的 `AnimationMixer`） | **能跳到指定时刻就别实时连拍**：`patch` 把 mixer 挂到 window，每步 `{"js": "__mixer.setTime(1.25)", "wait": 300}` 再 `shot`，帧均匀、首尾接得上 | 只能实时连拍（`seq` + `seconds`），靠 `probe` 记状态 |
 
 ## 第 2 步：截帧配置（每个坑都踩过）
 
@@ -40,11 +43,15 @@ grep -n "window\.__\|window\.[a-zA-Z]* *=" /tmp/site.html | head             # �
 - **网站会自己改视角**（窗口一变就重设 fov、鼠标拖动、自动旋转）：用 `camera` 锁住，每一帧都强制回到同一个位置。
   `dir: [1, 0.816, 1]` 就是等轴测方向；`fov` 越小越接近正交（20–30 合适）；`dist` 控制远近；`shift` 平移看的中心点。
   `controls` 填控制器变量，工具会把它关掉，免得它和锁相机抢。
-- **主体被裁到边**：`compose` 会提示「⚠️ 主体碰到截图边缘（左）」。这时把 `viewport` 开大重拍（例如 900→1000 宽），别去缩相机。
-  小耳FM 开门那一帧，红门圈就是这么被裁掉一块的。
+- **主体被裁到边**：`compose` 会提示「⚠️ 主体碰到截图边缘（左）」。先看是哪个方向：
+  - **左右**被裁：把 `viewport` 开宽重拍（例如 900→1000）。three.js 的视角是按高度算的，开宽只会多出左右两边，主体大小不变。小耳FM 开门那一帧，红门圈就是这么修好的。
+  - **上下**被裁：开高 viewport 没用（主体会跟着一起变大），要把 `camera.dist` 拉远，或把 `fov` 调大。
 - **动画太快拍不到**：截一张图要 0.3–0.5 秒。网站里的等待时间（`setTimeout(下一步, 2600)`）用 `patch` 拉长，例如拉到 15000，让中间那段多拍几张。
 - **拍到了哪一步**：`probe` 填一句返回页面状态的 JS（例如 `JSON.stringify(app.state)`）。`capture.json` 里每张图都会记下状态，对着看就知道哪张是在洗、哪张洗完了。
-- **透明底**：`transparent` 和 `hide_others` 默认都开，前提是网页背景没画在 WebGL 画布里面。要是截出来底色还在，就去源码里把 `renderer.setClearColor(..., 1)` 的透明度用 `patch` 改成 0。
+- **透明底**：`transparent` 和 `hide_others` 默认都开。截出来底色还在，说明背景画在 WebGL 画布里面了，要用 `patch` 改源码，三处都可能要改：
+  1. `new THREE.WebGLRenderer({ antialias: true })` → 加上 `alpha: true`；
+  2. `renderer.setClearColor(颜色, 1)` → 透明度改成 0，或者直接加一句 `renderer.setClearColor(0x000000, 0)`；
+  3. 背景是场景里的物体（`Sky` 天空、`scene.background`、背景大球）→ 去掉 `scene.add(sky)`，或者设 `scene.background = null`。环境光照要是靠天空烘出来的，在烘完之后再去掉。
 - **patch 没生效**：看输出里有没有「⚠️ patch 没找到原文」。`patch_url` 要匹配主页面的请求地址（例如 `"**/fm.xiaoercamera.xyz/"`，或 `"**/index.html"`）。
 
 ## 第 3 步：合成（compose 自动做）
@@ -53,6 +60,7 @@ grep -n "window\.__\|window\.[a-zA-Z]* *=" /tmp/site.html | head             # �
 - 阴影羽化：主体（不透明的部分）保持不变，只有半透明的阴影往边缘淡出，不会出现一圈硬边。
 - 同一套帧用同一个裁剪框：所有帧取并集再裁，不会一张大一张小、跳来跳去。
 - 尺寸：站点帧 560 宽，作品画 450×600，每张 jpg 十几 KB。整篇 100 多张图约 3–4MB 没问题；正文 HTML 要控制在 1MB 以内（图片不算在里面）。
+- **同一站的几套帧比例要一样**：`fm_washer` 的 `cover` 和 `wash` 共用一个 `aspect`。最省事的做法是放进同一个 raw 文件夹一起 compose，裁剪框就是同一个；分开拍的，用 `--crop` 给同一个框，或者给矮的那套上下补底色，别拉伸。
 - 输出的 `frames.json`：
   - `aspect`：填到站点模型的 `aspect` 参数（默认 0.7875，帧比例不一样就要改）。
   - `segments`：静止 / 局部在动 / 大动作三种段。例：洗衣机的「关门」是大动作，「洗」是局部在动（滚筒里在转），「洗好停住」是静止。
@@ -68,6 +76,19 @@ grep -n "window\.__\|window\.[a-zA-Z]* *=" /tmp/site.html | head             # �
 | `fm_paint` | 作品一点点长出来 | 渲染过程截 12 张（从空到满） |
 
 帧太多会变慢：一站 8–16 张最合适，step 0.12–0.18 秒。
+
+`fm_*` 站和等轴测原来那些模型（`gate`、`laptop`、`desktop`……见 `iso/models.py` 的 `MODELS`）可以混在同一篇里，没有真帧的站就用模型补。
+
+## 第 5–6 步：分镜和生成的细节
+
+- **输出目录自包含**：分镜引用的图片会被拷进 `out/<分镜名>/`，整个文件夹拷走也能打开 `preview.html`。
+- **封面**：自动封面截的是第 2 站。截得不好看（切到泡泡、药丸），就自己做一张 900×383，分镜里写 `"cover": "我的封面.jpg"`（相对分镜目录），重新生成不会再把它盖掉。
+- **自检截哪一秒**：`timeline.json` 里 `finish` 是最后一站开始讲完的时间，`end` 是整篇（含画廊、猜答案、落版）全部画完的时间。想看结尾，用 `end`。
+- **角色**：`"character": ["role/a.jpg"]`。1 张就是静止的；多张会按 0.13 秒一帧循环，最好是一段来回晃的小动作（左看 → 右看 → 左看），不然会抖。泡泡别写太长，一句话。
+
+## 没有 AppID 怎么交付
+
+照样能做完，本地 `preview.html` 能完整预览。但图片是本地文件，粘贴台粘进公众号图会丢。开工前先跟用户说清楚：等拿到 AppID，`--push` 会自动传图、换链接、推草稿。
 
 ## 写法（这类文章怎么才好看，小耳反复改过的）
 

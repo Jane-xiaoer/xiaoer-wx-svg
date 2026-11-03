@@ -1,0 +1,180 @@
+{
+ "_说明": "three.js 官方示例 Littlest Tokyo（模型 Glen Fox，CC Attribution）。演示：patch 出透明底（alpha + clearColor 0 + 去掉 Sky）、把相机/控制器/动画挂到 window、用 __seek(t) 跳到动画的指定时刻再截，10 秒动画均匀截 16 张。",
+ "url": "https://threejs.org/examples/webgl_animation_keyframes.html",
+ "viewport": [
+  1000,
+  900
+ ],
+ "webgl": true,
+ "element": "#container > canvas:last-child",
+ "transparent": true,
+ "hide_others": true,
+ "patch_url": "**/webgl_animation_keyframes.html",
+ "patch": [
+  [
+   "new THREE.WebGLRenderer( { antialias: true } )",
+   "new THREE.WebGLRenderer( { antialias: true, alpha: true } )"
+  ],
+  [
+   "renderer.toneMapping = THREE.ACESFilmicToneMapping;",
+   "renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.setClearColor( 0x000000, 0 ); window.__renderer = renderer;"
+  ],
+  [
+   "scene.add( sky );",
+   "window.__sky = sky; /* 天空只用来烘环境贴图，不上屏 */"
+  ],
+  [
+   "const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );",
+   "const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 ); window.__cam = camera; window.__THREE = THREE;"
+  ],
+  [
+   "const controls = new OrbitControls( camera, renderer.domElement );",
+   "const controls = new OrbitControls( camera, renderer.domElement ); window.__ctl = controls;"
+  ],
+  [
+   "mixer = new THREE.AnimationMixer( model );",
+   "window.__model = model; window.__scene = scene; window.__clip = gltf.animations[ 0 ]; window.__mixer = mixer = new THREE.AnimationMixer( model ); window.__pause = false; window.__seek = ( t ) => { window.__pause = true; mixer.setTime( t ); renderer.render( scene, camera ); };"
+  ],
+  [
+   "mixer.update( delta );",
+   "if ( ! window.__pause ) mixer.update( delta );"
+  ]
+ ],
+ "wait": 6000,
+ "probe": "JSON.stringify({t: +(window.__mixer?.time || 0).toFixed(2), paused: window.__pause === true})",
+ "camera": {
+  "camera": "window.__cam",
+  "target": "window.__ctl.target",
+  "controls": "window.__ctl",
+  "dir": [
+   1,
+   0.7,
+   1
+  ],
+  "dist": 16,
+  "fov": 30,
+  "shift": [
+   0.07,
+   0.36,
+   -0.26
+  ]
+ },
+ "steps": [
+  {
+   "js": "@camera",
+   "wait": 800
+  },
+  {
+   "js": "__seek(0.00)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_000"
+  },
+  {
+   "js": "__seek(0.62)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_001"
+  },
+  {
+   "js": "__seek(1.25)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_002"
+  },
+  {
+   "js": "__seek(1.88)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_003"
+  },
+  {
+   "js": "__seek(2.50)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_004"
+  },
+  {
+   "js": "__seek(3.12)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_005"
+  },
+  {
+   "js": "__seek(3.75)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_006"
+  },
+  {
+   "js": "__seek(4.38)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_007"
+  },
+  {
+   "js": "__seek(5.00)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_008"
+  },
+  {
+   "js": "__seek(5.62)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_009"
+  },
+  {
+   "js": "__seek(6.25)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_010"
+  },
+  {
+   "js": "__seek(6.88)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_011"
+  },
+  {
+   "js": "__seek(7.50)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_012"
+  },
+  {
+   "js": "__seek(8.12)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_013"
+  },
+  {
+   "js": "__seek(8.75)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_014"
+  },
+  {
+   "js": "__seek(9.38)",
+   "wait": 260
+  },
+  {
+   "shot": "wide_015"
+  }
+ ]
+}

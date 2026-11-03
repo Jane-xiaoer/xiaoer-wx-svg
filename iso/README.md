@@ -101,6 +101,7 @@ python3 iso/iso_journey.py templates/storyboards/等轴测-小耳FM洗衣房.jso
 | `"palette": "fm"` | 奶油底 + 珊瑚红 |
 | `"assets": "文件夹名"` | 图片放在分镜旁边这个子文件夹里，分镜里只写相对路径（`washer/jpg/open.jpg`） |
 | `"character": ["role/a.jpg", …]` | 开场和泡泡旁边的角色：一组帧会循环（左右张望），1 张就是静止的；不填用小耳 |
+| `"cover": "封面.jpg"` | 用自己做的封面（900×383），不自动截 |
 | `"legend": false` | 不显示右上角「N STOPS」和分类图例 |
 | `"prologue"` | 开场：`hello` 角色招呼 → `question` 几行大问题 → `glimpses` 左右交替的小画 + 一句话 → `so` / `so_say` → 可选 `why` / `why_say` 一问一答 |
 | `"gallery"` | 路走完后的晾衣绳：`works` 每幅 `{name, note, frames}`，三幅一根绳，画沿绳滑进来、夹子夹住、一直轻轻晃，夹好后逐帧显影；可选 `guess`（问题 + 点一下看答案，不点几秒后自动揭开）、`credit`、`outro_say` |
