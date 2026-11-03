@@ -494,6 +494,8 @@ def trio(d, y, t, th):
         out.append(rise(text(540, y + 1080 + i * 90, r, 38, tx_, 500), t2 + 1.8 + i * 0.3, 0.6, 40))
     lx, ly = 540, y + 1520
     tl = t + 5.4
+    if not (d.get("lock_title") or d.get("lock_sub") or d.get("lock")):  # 锁只给隐私 / 安全 / 本地题材，没填就不画
+        return out, 7.6
     out.append(draw(f"M{lx - 90} {ly - 20}h180v170h-180Z", tl, 0.7, a, 6))
     out.append(draw(f"M{lx - 55} {ly - 20}V{ly - 80}A55 55 0 0 1 {lx + 55} {ly - 80}V{ly - 20}", tl + 0.4, 0.6, a, 6))
     out.append(pop(f'<circle cx="{lx}" cy="{ly + 55}" r="18" fill="{a}"/>', lx, ly + 55, tl + 0.9, 0.4))

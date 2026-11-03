@@ -28,13 +28,14 @@ scenes.SCENES.update(scenes_extra.SCENES)
 def build(sb):
     th = themes.get(sb.get("theme", "graphite-green"))
     items = sb.get("scenes") or sys.exit("分镜里没有 scenes")
-    els, reveals, t = [], [], 0.0
+    els, reveals, t, starts = [], [], 0.0, []
     for k, sc in enumerate(items):
         kind = sc.get("type")
         if kind not in scenes.SCENES:
             sys.exit(f"第 {k + 1} 屏类型「{kind}」不存在，可选：{' / '.join(scenes.SCENES)}")
         if k:
             reveals.append([round(t - 0.4, 2), (k + 1) * scenes.SCREEN])
+        starts.append((kind, round(t, 2)))
         part, dur = scenes.SCENES[kind](sc, k * scenes.SCREEN, t, th)
         els += part
         t += dur
@@ -45,7 +46,16 @@ def build(sb):
     tail = "".join(f'<p style="text-align:center;font-size:{14 if i == 0 else 12}px;color:#{"888" if i == 0 else "aaa"};'
                    f'margin:{24 if i == 0 else 0}px 0 {8 if i == 0 else 24}px;">{escape(line)}</p>'
                    for i, line in enumerate(sb.get("tail", [])[:2]))
+    build.starts = starts  # 每屏几秒开始，render 写进 timeline.json
     return article + tail, t, len(items), th
+
+
+def scale_times(html, k):
+    """整体时间轴乘 k：begin 里的秒数（含 click;Ns）和 dur 都乘；keyTimes 是比例不用动。"""
+    import re
+    num = lambda m: f"{float(m.group(1)) * k:.3f}".rstrip("0").rstrip(".") + "s"  # noqa: E731
+    html = re.sub(r'(begin=")([^"]+)(")', lambda m: m.group(1) + re.sub(r"([0-9]*\.?[0-9]+)s", num, m.group(2)) + m.group(3), html)
+    return re.sub(r'dur="([0-9]*\.?[0-9]+)s"', lambda m: 'dur="' + num(m) + '"', html)
 
 
 COVER = """<!doctype html><html><body style="margin:0;width:900px;height:383px;background:{bg};overflow:hidden">
@@ -97,11 +107,17 @@ def cover(sb, th, out):
     return out / "cover.jpg"
 
 
-def render(sb, out, cover_path=None):
-    """生成 article.html / preview.html / cover.jpg，返回 (秒数, 屏数, KB, 封面路径)。"""
+def render(sb, out, cover_path=None, speed=1.0):
+    """生成 article.html / preview.html / cover.jpg / timeline.json，返回 (秒数, 屏数, KB, 封面路径)。"""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     article, total, screens, th = build(sb)
+    starts = [(kind, round(s * speed, 2)) for kind, s in build.starts]
+    if speed != 1.0:
+        article, total = scale_times(article, speed), total * speed
+    (out / "timeline.json").write_text(json.dumps(
+        {"screens": [{"screen": i, "type": kind, "start": s} for i, (kind, s) in enumerate(starts)],
+         "total": round(total, 2), "speed": speed}, ensure_ascii=False, indent=1), encoding="utf-8")
     title = sb.get("title", out.name)
     (out / "article.html").write_text(article, encoding="utf-8")
     (out / "preview.html").write_text(wxsvg.PREVIEW.format(
@@ -128,12 +144,15 @@ def main():
     ap.add_argument("--push", action="store_true", help="推进公众号草稿箱")
     ap.add_argument("--update", help="更新这篇草稿（media_id），不新建")
     ap.add_argument("--cover", help="自己指定封面图")
+    ap.add_argument("--speed", type=float, default=1.0, help="整体时间乘数：0.85 = 快 15%%，1.2 = 慢 20%%")
     a = ap.parse_args()
     sp = Path(a.storyboard)
     sb = json.loads(sp.read_text(encoding="utf-8"))
     out = Path(a.out) if a.out else Path.cwd() / "out" / sp.stem
-    total, screens, kb, cv = render(sb, out, a.cover)
+    total, screens, kb, cv = render(sb, out, a.cover, a.speed)
     print(f"✅ {out}/  {screens} 屏 · {total:.0f} 秒 · {kb:.0f}KB")
+    tl = json.loads((out / "timeline.json").read_text(encoding="utf-8"))
+    print("  每屏开始：" + "  ".join(f"#{s['screen']} {s['type']} {s['start']}s" for s in tl["screens"]))
     if kb > 1000:
         print("⚠️ 超过 1MB，公众号可能存不下，减几屏")
     if a.push:

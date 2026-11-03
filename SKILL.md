@@ -47,10 +47,14 @@ python3 -m playwright install chromium   # 只用来出封面图和截帧检查�
 
 ```bash
 open out/<名字>/preview.html          # 浏览器里看，「重播」从头播
-python3 tools/frames.py "$PWD/out/<名字>/preview.html" out/<名字>/frames.png 2,0 8,1 15,2   # 跳到第 N 秒、第 M 屏截图拼一张
+cat out/<名字>/timeline.json          # 每屏 / 每站几秒开始
+python3 tools/frames.py out/<名字>/preview.html out/<名字>/frames.png 7.6,0 13.6,1 21.8,2
 ```
 
-自己看截图：字有没有挤、有没有压到图、下一屏是不是提前长出来、节奏会不会让读者干等（太慢就加 `--speed 0.85`）。
+- `frames.py` 的参数是「秒,屏」：秒从 `timeline.json` 里取（想看第 N 屏画完的样子，填第 N+1 屏的开始秒数）；屏按 1080×1920 一屏，从 0 数，可以写小数。等轴测是一张长图，「屏」不等于「站」，先截 0、1、2 看位置再调。
+- 用你的看图能力看截图：字有没有挤、有没有压到图、下一屏是不是提前长出来、画面跟题材搭不搭。
+- 节奏：两条路都能加 `--speed`（0.85 = 快 15%，1.2 = 慢 20%）。
+- 画面和题材对不上（比如讲咖啡却出现机柜、声波），宁可换场景或按第 6 节做新的，别硬凑。
 
 ## 5. 交付
 
@@ -71,7 +75,8 @@ python3 motion/make.py 分镜.json --push          # 等轴测：python3 iso/iso
 python3 tools/paste.py out/<名字>/article.html
 ```
 
-会在浏览器打开 https://svg.xiaoeromia.com/paste/ 。文章放在网址 `#` 后面，不会上传。告诉用户：
+会在浏览器打开 https://svg.xiaoeromia.com/paste/ 。文章放在网址 `#` 后面，不会上传。
+没有图形界面（服务器、远程环境）就加 `--print` 只打印链接，链接很长：存成文件交给用户，或者让用户打开粘贴台、把 `out/<名字>/article.html` 拖进去。告诉用户：
 1. 点「复制到公众号」
 2. 公众号后台 →「新的创作」→「文章」，在正文里粘贴（Ctrl/⌘ + V）
 3. 填标题、上传封面（`out/<名字>/cover.jpg`），点「预览」发到手机检查，再群发

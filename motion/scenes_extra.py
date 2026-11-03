@@ -61,14 +61,17 @@ def receipt(d, y, t, th):
         body.append(text(x0 + 50, ty + 20, d["total"][0], 36, ink, 800, "start", maxw=300) +
                     text(x0 + w - 50, ty + 20, d["total"][1], 34, ink, 800, "end", MONO, maxw=300))
     dur = 2.4
-    out = [f'<g transform="translate(0 {-h})">{anim_tf("translate", f"0 {-h}", "0 0", t + 0.6, dur)}{"".join(body)}</g>',
+    # 纸从出纸口吐出来：起点最多推到本屏顶部（上面有底色挡着），开始前完全隐藏——不然长单子会伸进上一屏穿帮
+    off = min(h, slot - y)
+    out = [f'<g opacity="0"><set attributeName="opacity" to="1" begin="{n(round(t + 0.6, 3))}s"/>'
+           f'<g transform="translate(0 {-off})">{anim_tf("translate", f"0 {-off}", "0 0", t + 0.6, dur)}{"".join(body)}</g></g>',
            f'<rect x="0" y="{y}" width="1080" height="{slot - y}" fill="{th["bg"]}"/>',
            f'<rect x="150" y="{slot - 24}" width="780" height="44" rx="22" fill="{th["deep"]}" stroke="{th["line"]}" stroke-width="2"/>',
            f'<rect x="180" y="{slot - 6}" width="720" height="8" rx="4" fill="{th["bg"]}"/>']
     out += heading(d, y, t, th, 150, 260)
     # 印章：旋转的双框 + 大字
     st = d.get("stamp", "¥0")
-    cx, cy = 600, slot + h * 0.55
+    cx, cy = 650, min(slot + h + 75, y + 1300)  # 盖在单子底边下沿，别压住单子里的字
     seal = (f'<g transform="rotate(-14 {cx} {cy})" opacity="0.93">'
             f'<rect x="{cx - 230}" y="{cy - 140}" width="460" height="280" rx="34" fill="none" stroke="{a}" stroke-width="10"/>'
             f'<rect x="{cx - 206}" y="{cy - 116}" width="412" height="232" rx="24" fill="none" stroke="{a}" stroke-width="4"/>'

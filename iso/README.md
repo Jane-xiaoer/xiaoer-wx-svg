@@ -28,7 +28,7 @@ python3 iso/iso_journey.py 分镜.json --update <media_id>
   "intro": "一两句导语（自动换行）", "start_label": "START", "end_label": "FINISH",
   "stops": [
     {"kind": "分类（同类同色，自动进图例）", "title": "站名", "place": "灰色小字",
-     "body": "正文 40–60 字", "en": "ENGLISH LABEL", "model": "laptop", "args": {"chip": "MLX"}}
+     "body": "正文，最多 60 字（事实不够就写短，别凑）", "en": "ENGLISH LABEL", "model": "laptop", "args": {"chip": "MLX"}}
   ],
   "end": {"title": "落版大字", "lines": ["一两行小字"]},
   "advice": {"kicker": "IF YOU WANT ONE", "title": "想自己搭一套？6 条建议", "sub": "一句副标",
@@ -55,13 +55,15 @@ python3 iso/iso_journey.py 分镜.json --update <media_id>
 | model | 画面 | args |
 |---|---|---|
 | `archive` | 一摞数据盘（灯闪）+ 头顶漂档案卡 | — |
-| `laptop` | 笔记本，屏上代码条循环重写 + 芯片牌 | `chip`（牌子上的字，空字符串就不放牌）、`old` |
-| `gate` | 两柱一楣的门，楣上写字，地上箭头穿门流过 | `text` |
-| `desktop` | 台式机：显示器里方块在转，机箱风扇转、灯条呼吸 | `tag` |
-| `server` | 机柜，一格格灯闪 + 隧道管里光点流动 | `slots` |
-| `checklist` | 旧笔记本 + 清单板，勾一个个打上 | `items` |
+| `laptop` | 笔记本，屏上代码条循环重写 + 芯片牌 | `chip`：字符串，牌子上的字（≤4 字符；`""` = 不放牌）；`old`：布尔，小一号的旧机 |
+| `gate` | 两柱一楣的门，楣上写字，地上箭头穿门流过 | `text`：字符串，楣上的字（≤6 字符）。**最中性的模型**，什么题材都能用来写一个关键数 |
+| `desktop` | 台式机：显示器里方块在转，机箱风扇转、灯条呼吸 | `tag`：字符串，机箱侧面的字（≤8 字符） |
+| `server` | 机柜，一格格灯闪 + 隧道管里光点流动 | `slots`：整数，机柜格数（默认 6） |
+| `checklist` | 旧笔记本 + 清单板，勾一个个打上 | `items`：整数，打几个勾（默认 4）；`chip` 同 laptop |
 | `antenna` | 信号塔一节节长高，塔顶红灯闪，脚下波纹扩散 | — |
-| `mailbox` | 信箱，信封一封封掉进去，小旗立起 | `flag` |
+| `mailbox` | 信箱，信封一封封掉进去，小旗立起 | `flag`：字符串，箱子上的字（≤2 字） |
+
+现在的模型偏科技（电脑、机房、信号）。**题材对不上时**（咖啡、旅行、餐饮……）：只有一两站用中性的 `gate`，其余按下面「加一个新模型」现做（一个模型通常就是 3–6 个长方体），别拿电脑类模型硬凑，读者会被误导。
 
 通用小件：`tree` / `bush` / `lamp` / `tile_path`（铺路砖），每个模型都可以加。
 
