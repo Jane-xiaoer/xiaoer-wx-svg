@@ -45,6 +45,7 @@ python3 -m playwright install chromium        # 可选：封面图和截帧
 
 python3 motion/make.py templates/storyboards/方法论-番茄工作法.json       # → out/方法论-番茄工作法/preview.html
 python3 iso/iso_journey.py templates/storyboards/等轴测-小耳的四台电脑.json
+python3 iso/iso_journey.py templates/storyboards/等轴测-小耳FM洗衣房.json --grow --speed 0.8   # 带真图片帧的产品故事
 python3 tools/paste.py out/方法论-番茄工作法/article.html                 # 打开粘贴台，一键复制
 
 # 推进你自己的草稿箱

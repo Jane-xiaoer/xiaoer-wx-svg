@@ -1,0 +1,395 @@
+{
+ "title": "一首歌，长什么样？（3D版）",
+ "digest": "你有没有想过，一首歌如果能看见，会长什么样？我做了一台洗衣机，把歌放进去，洗出一幅随音乐慢慢长出来的画。",
+ "palette": "fm",
+ "kicker": "XIAOER FM · 小耳FM",
+ "headline": "把一首歌，洗成一幅画",
+ "subtitle": "像洗照片一样",
+ "intro": "",
+ "start_label": "SONG",
+ "end_label": "PAINTING",
+ "prologue": {
+  "hello": "嗨～先问你一个问题哦。",
+  "question": [
+   [
+    "你有没有想过——",
+    38,
+    "muted",
+    500
+   ],
+   [
+    "一首歌，如果能看见，",
+    54,
+    "ink",
+    800
+   ],
+   [
+    "它会长什么样？",
+    54,
+    "red",
+    800
+   ]
+  ],
+  "glimpses": [
+   {
+    "frames": [
+     "paintings/cyano/w/frame_00.jpg",
+     "paintings/cyano/w/frame_01.jpg",
+     "paintings/cyano/w/frame_02.jpg",
+     "paintings/cyano/w/frame_03.jpg",
+     "paintings/cyano/w/frame_04.jpg",
+     "paintings/cyano/w/frame_05.jpg",
+     "paintings/cyano/w/frame_06.jpg",
+     "paintings/cyano/w/frame_07.jpg",
+     "paintings/cyano/w/frame_08.jpg",
+     "paintings/cyano/w/frame_09.jpg",
+     "paintings/cyano/w/frame_10.jpg",
+     "paintings/cyano/w/frame_11.jpg"
+    ],
+    "text": "有的歌是蓝色的，像夏天晒在窗台上的一张蓝图。"
+   },
+   {
+    "frames": [
+     "paintings/weave/w/frame_00.jpg",
+     "paintings/weave/w/frame_01.jpg",
+     "paintings/weave/w/frame_02.jpg",
+     "paintings/weave/w/frame_03.jpg",
+     "paintings/weave/w/frame_04.jpg",
+     "paintings/weave/w/frame_05.jpg",
+     "paintings/weave/w/frame_06.jpg",
+     "paintings/weave/w/frame_07.jpg",
+     "paintings/weave/w/frame_08.jpg",
+     "paintings/weave/w/frame_09.jpg",
+     "paintings/weave/w/frame_10.jpg",
+     "paintings/weave/w/frame_11.jpg"
+    ],
+    "text": "有的歌一响，就暖暖的，像一件刚织好的毛衣。"
+   },
+   {
+    "frames": [
+     "paintings/guofeng/w/frame_00.jpg",
+     "paintings/guofeng/w/frame_01.jpg",
+     "paintings/guofeng/w/frame_02.jpg",
+     "paintings/guofeng/w/frame_03.jpg",
+     "paintings/guofeng/w/frame_04.jpg",
+     "paintings/guofeng/w/frame_05.jpg",
+     "paintings/guofeng/w/frame_06.jpg",
+     "paintings/guofeng/w/frame_07.jpg",
+     "paintings/guofeng/w/frame_08.jpg",
+     "paintings/guofeng/w/frame_09.jpg",
+     "paintings/guofeng/w/frame_10.jpg",
+     "paintings/guofeng/w/frame_11.jpg"
+    ],
+    "text": "有的歌，是一幅慢慢晕开的水墨。"
+   },
+   {
+    "frames": [
+     "paintings/discloom/w/frame_00.jpg",
+     "paintings/discloom/w/frame_01.jpg",
+     "paintings/discloom/w/frame_02.jpg",
+     "paintings/discloom/w/frame_03.jpg",
+     "paintings/discloom/w/frame_04.jpg",
+     "paintings/discloom/w/frame_05.jpg",
+     "paintings/discloom/w/frame_06.jpg",
+     "paintings/discloom/w/frame_07.jpg",
+     "paintings/discloom/w/frame_08.jpg",
+     "paintings/discloom/w/frame_09.jpg",
+     "paintings/discloom/w/frame_10.jpg",
+     "paintings/discloom/w/frame_11.jpg"
+    ],
+    "text": "有的歌转起来，像一张唱片，被一圈一圈织满。"
+   }
+  ],
+  "so": [
+   [
+    "我也一直想知道。",
+    34,
+    "muted",
+    500
+   ],
+   [
+    "所以，我做了一台洗衣机。",
+    50,
+    "ink",
+    800
+   ]
+  ],
+  "so_say": "对，洗衣机，你没听错～",
+  "why": [
+   [
+    "等等，为什么是洗衣机？",
+    40,
+    "ink",
+    800
+   ]
+  ],
+  "why_say": "因为洗照片，也叫「洗」呀。"
+ },
+ "stops": [
+  {
+   "kind": "开门",
+   "title": "先开门",
+   "place": "小耳FM 首页这一台",
+   "body": "",
+   "en": "OPEN",
+   "model": "fm_done",
+   "args": {
+    "frames": [
+     "washer/jpg/open.jpg"
+    ],
+    "still": "washer/jpg/closed.jpg",
+    "dur": 0.6,
+    "say": "门在这儿～"
+   }
+  },
+  {
+   "kind": "放歌",
+   "title": "放一首歌进去",
+   "place": "你最爱的那首就行",
+   "body": "",
+   "en": "PUT A SONG IN",
+   "model": "fm_washer",
+   "args": {
+    "cover": [
+     "washer/jpg/put_00.jpg",
+     "washer/jpg/put_01.jpg",
+     "washer/jpg/put_02.jpg",
+     "washer/jpg/put_03.jpg",
+     "washer/jpg/put_04.jpg",
+     "washer/jpg/put_05.jpg",
+     "washer/jpg/put_06.jpg",
+     "washer/jpg/put_07.jpg"
+    ],
+    "wash": [
+     "washer/jpg/seq_003.jpg"
+    ],
+    "say": "放好了？点门，关上！"
+   }
+  },
+  {
+   "kind": "洗",
+   "title": "咕噜咕噜",
+   "place": "洗歌中",
+   "body": "",
+   "en": "WASHING",
+   "model": "fm_frames",
+   "args": {
+    "frames": [
+     "washer/jpg/seq_003.jpg",
+     "washer/jpg/seq_005.jpg",
+     "washer/jpg/seq_007.jpg",
+     "washer/jpg/seq_009.jpg",
+     "washer/jpg/seq_011.jpg",
+     "washer/jpg/seq_013.jpg",
+     "washer/jpg/seq_015.jpg",
+     "washer/jpg/seq_017.jpg",
+     "washer/jpg/seq_019.jpg",
+     "washer/jpg/seq_021.jpg",
+     "washer/jpg/seq_023.jpg",
+     "washer/jpg/seq_025.jpg",
+     "washer/jpg/seq_027.jpg",
+     "washer/jpg/seq_029.jpg",
+     "washer/jpg/seq_031.jpg",
+     "washer/jpg/seq_033.jpg"
+    ],
+    "step": 0.15,
+    "say": "嘘——它在认真听歌呢。",
+    "stay": 3.6
+   }
+  },
+  {
+   "kind": "洗好啦",
+   "title": "洗好啦！",
+   "place": "滚出来六坨颜料",
+   "body": "",
+   "en": "SIX COLORS",
+   "model": "fm_done",
+   "args": {
+    "frames": [
+     "washer/jpg/seq_034.jpg",
+     "washer/jpg/seq_035.jpg",
+     "washer/jpg/seq_036.jpg",
+     "washer/jpg/seq_037.jpg",
+     "washer/jpg/seq_038.jpg",
+     "washer/jpg/seq_039.jpg",
+     "washer/jpg/seq_040.jpg",
+     "washer/jpg/seq_041.jpg",
+     "washer/jpg/seq_042.jpg",
+     "washer/jpg/seq_043.jpg",
+     "washer/jpg/seq_044.jpg",
+     "washer/jpg/seq_045.jpg",
+     "washer/jpg/seq_046.jpg",
+     "washer/jpg/seq_047.jpg",
+     "washer/jpg/seq_048.jpg"
+    ],
+    "still": "washer/jpg/seq_033.jpg",
+    "say": "一种声音，一种颜色。"
+   }
+  },
+  {
+   "kind": "画",
+   "title": "颜料自己会画画",
+   "place": "歌放到哪儿，画就长到哪儿",
+   "body": "",
+   "en": "ONE SOUND, ONE STROKE",
+   "model": "fm_paint",
+   "args": {
+    "frames": [
+     "paintings/weave/w/frame_00.jpg",
+     "paintings/weave/w/frame_01.jpg",
+     "paintings/weave/w/frame_02.jpg",
+     "paintings/weave/w/frame_03.jpg",
+     "paintings/weave/w/frame_04.jpg",
+     "paintings/weave/w/frame_05.jpg",
+     "paintings/weave/w/frame_06.jpg",
+     "paintings/weave/w/frame_07.jpg",
+     "paintings/weave/w/frame_08.jpg",
+     "paintings/weave/w/frame_09.jpg",
+     "paintings/weave/w/frame_10.jpg",
+     "paintings/weave/w/frame_11.jpg"
+    ],
+    "dur": 6.0,
+    "name": "织毛衣",
+    "say": "我可没动手，是歌自己在画。"
+   }
+  }
+ ],
+ "gallery": {
+  "kicker": "像洗照片一样",
+  "title": "洗好的画，晾起来",
+  "sub": "",
+  "works": [
+   {
+    "name": "蓝色的",
+    "note": "一张会长的植物志",
+    "frames": [
+     "paintings/cyano/w/frame_00.jpg",
+     "paintings/cyano/w/frame_01.jpg",
+     "paintings/cyano/w/frame_02.jpg",
+     "paintings/cyano/w/frame_03.jpg",
+     "paintings/cyano/w/frame_04.jpg",
+     "paintings/cyano/w/frame_05.jpg",
+     "paintings/cyano/w/frame_06.jpg",
+     "paintings/cyano/w/frame_07.jpg",
+     "paintings/cyano/w/frame_08.jpg",
+     "paintings/cyano/w/frame_09.jpg",
+     "paintings/cyano/w/frame_10.jpg",
+     "paintings/cyano/w/frame_11.jpg"
+    ]
+   },
+   {
+    "name": "织毛衣",
+    "note": "一件温暖的毛衣",
+    "frames": [
+     "paintings/weave/w/frame_00.jpg",
+     "paintings/weave/w/frame_01.jpg",
+     "paintings/weave/w/frame_02.jpg",
+     "paintings/weave/w/frame_03.jpg",
+     "paintings/weave/w/frame_04.jpg",
+     "paintings/weave/w/frame_05.jpg",
+     "paintings/weave/w/frame_06.jpg",
+     "paintings/weave/w/frame_07.jpg",
+     "paintings/weave/w/frame_08.jpg",
+     "paintings/weave/w/frame_09.jpg",
+     "paintings/weave/w/frame_10.jpg",
+     "paintings/weave/w/frame_11.jpg"
+    ]
+   },
+   {
+    "name": "细胞水彩",
+    "note": "一滴滴晕开的细胞",
+    "frames": [
+     "paintings/v7/w/frame_00.jpg",
+     "paintings/v7/w/frame_01.jpg",
+     "paintings/v7/w/frame_02.jpg",
+     "paintings/v7/w/frame_03.jpg",
+     "paintings/v7/w/frame_04.jpg",
+     "paintings/v7/w/frame_05.jpg",
+     "paintings/v7/w/frame_06.jpg",
+     "paintings/v7/w/frame_07.jpg",
+     "paintings/v7/w/frame_08.jpg",
+     "paintings/v7/w/frame_09.jpg",
+     "paintings/v7/w/frame_10.jpg",
+     "paintings/v7/w/frame_11.jpg"
+    ]
+   },
+   {
+    "name": "國風",
+    "note": "一幅会长的水墨山水",
+    "frames": [
+     "paintings/guofeng/w/frame_00.jpg",
+     "paintings/guofeng/w/frame_01.jpg",
+     "paintings/guofeng/w/frame_02.jpg",
+     "paintings/guofeng/w/frame_03.jpg",
+     "paintings/guofeng/w/frame_04.jpg",
+     "paintings/guofeng/w/frame_05.jpg",
+     "paintings/guofeng/w/frame_06.jpg",
+     "paintings/guofeng/w/frame_07.jpg",
+     "paintings/guofeng/w/frame_08.jpg",
+     "paintings/guofeng/w/frame_09.jpg",
+     "paintings/guofeng/w/frame_10.jpg",
+     "paintings/guofeng/w/frame_11.jpg"
+    ]
+   },
+   {
+    "name": "唱片织机",
+    "note": "一串歌的密码",
+    "frames": [
+     "paintings/discloom/w/frame_00.jpg",
+     "paintings/discloom/w/frame_01.jpg",
+     "paintings/discloom/w/frame_02.jpg",
+     "paintings/discloom/w/frame_03.jpg",
+     "paintings/discloom/w/frame_04.jpg",
+     "paintings/discloom/w/frame_05.jpg",
+     "paintings/discloom/w/frame_06.jpg",
+     "paintings/discloom/w/frame_07.jpg",
+     "paintings/discloom/w/frame_08.jpg",
+     "paintings/discloom/w/frame_09.jpg",
+     "paintings/discloom/w/frame_10.jpg",
+     "paintings/discloom/w/frame_11.jpg"
+    ]
+   },
+   {
+    "name": "留声盘",
+    "note": "一首歌，一张星盘",
+    "frames": [
+     "paintings/grooveplate/w/frame_00.jpg",
+     "paintings/grooveplate/w/frame_01.jpg",
+     "paintings/grooveplate/w/frame_02.jpg",
+     "paintings/grooveplate/w/frame_03.jpg",
+     "paintings/grooveplate/w/frame_04.jpg",
+     "paintings/grooveplate/w/frame_05.jpg",
+     "paintings/grooveplate/w/frame_06.jpg",
+     "paintings/grooveplate/w/frame_07.jpg",
+     "paintings/grooveplate/w/frame_08.jpg",
+     "paintings/grooveplate/w/frame_09.jpg",
+     "paintings/grooveplate/w/frame_10.jpg",
+     "paintings/grooveplate/w/frame_11.jpg"
+    ]
+   }
+  ],
+  "guess": [
+   "猜猜看：这六幅画，是几首歌洗出来的？",
+   "就一首！",
+   "全是这首《Evening Fall》，只是换了六种画法。"
+  ],
+  "credit": "音乐：Evening Fall (Harp) — Kevin MacLeod (incompetech.com) · CC BY 4.0",
+  "outro_say": "轮到你啦。"
+ },
+ "end": {
+  "title": "你最爱的那首歌，长什么样？",
+  "lines": [
+   "去洗一首看看 ↓"
+  ],
+  "url": [
+   "fm.",
+   "xiaoer",
+   "camera.xyz"
+  ]
+ },
+ "tail": [
+  "XIAOER FM · 小耳FM"
+ ],
+ "legend": false,
+ "assets": "等轴测-小耳FM洗衣房"
+}

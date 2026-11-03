@@ -2,10 +2,16 @@
 """生成演示站 site/dist：首页、粘贴台、每个模板的演示页、sitemap / robots / llms.txt。
 
   python3 site/build.py            # 先跑一遍各模板生成 out/，再拼站
+  WXSVG_CASES=cases.json python3 site/build.py   # 另加首页「真实作品」栏（作品文件不进仓库）
+
+cases.json：[{"slug","title","product","desc","article": 本地 article.html 路径, "t": 缩略图秒数,
+             "link": 产品网址, "status": "live" | "soon"}]，status=soon 的只显示「制作中」卡片。
 部署：Vercel 静态站，根目录 site/dist（自己部署也行，纯静态）。
 """
 import asyncio
 import json
+import os
+import tempfile
 import shutil
 import subprocess
 import sys
@@ -24,6 +30,8 @@ OMIA = "https://xiaoeromia.com"
 DEMOS = [
     ("isometric-journey", "等轴测旅程 · 3D", "等轴测旅程", "流程、路线、链路：Z 字公路串起一站站 2.5D 小场景，零件一块块拼起来，光点沿路跑；结尾带建议卡和工具墙",
      ["iso/iso_journey.py", "templates/storyboards/等轴测-小耳的四台电脑.json"], "等轴测-小耳的四台电脑", 40),
+    ("fm-laundry", "等轴测 · 产品故事（带图片帧）", "等轴测旅程", "有真实 3D 资产或作品图的产品：浪漫开场问一句、角色说话泡泡、一站站真帧动画、作品一幅幅晾上绳子、点一下猜答案、结尾大网址",
+     ["iso/iso_journey.py", "templates/storyboards/等轴测-小耳FM洗衣房.json", "--grow", "--speed", "0.8"], "等轴测-小耳FM洗衣房", 14),
     ("product-launch", "产品发布 · 8 屏", "套模板", "软件产品：一堆东西被吸成品牌、产品窗口长出来、数字滚动、价格卡",
      ["motion/make.py", "templates/storyboards/产品-Omia-8屏.json"], "产品-Omia-8屏", 70),
     ("hardware-app", "硬件 + App · 带互动", "套模板", "硬件产品：账单吐出来盖章、设备蓝牙同步、点一下开会字幕循环冒出",
@@ -81,13 +89,13 @@ def head(title, desc, path, index=True, extra=""):
 
 
 NAV = f"""<div class="wrap"><nav><a href="/" style="margin:0;font-weight:700">小耳公众号SVG</a>
-<span><a href="/#templates">模板</a><a href="/paste/">粘贴台</a><a href="{REPO}">GitHub</a><a href="{OMIA}">Xiaoer Omia</a></span></nav></div>"""
+<span><a href="/#works">作品</a><a href="/#templates">模板</a><a href="/paste/">粘贴台</a><a href="{REPO}">GitHub</a><a href="{OMIA}">Xiaoer Omia</a></span></nav></div>"""
 
 FOOT = f"""<footer><div class="wrap">小耳公众号SVG 由 <a href="{OMIA}">Xiaoer Omia</a> 出品。Xiaoer Omia：一个窗口打开 150 多种文件的万能阅读器。<br>
 代码 MIT 开源：<a href="{REPO}">{REPO.replace("https://", "")}</a> · 推到草稿箱 ≠ 发布，发布永远由你自己点。</div></footer>"""
 
 
-def demo_page(slug, name, route, fit, article):
+def demo_page(slug, name, route, fit, article, sb_path=""):
     title = f"{name} · 公众号 SVG 动效模板 · 小耳公众号SVG"
     desc = f"{name}：{fit}。纯 SVG，公众号原生支持，可一键复制到公众号编辑器。"
     return head(title, desc, f"/t/{slug}/") + NAV + f"""
@@ -99,7 +107,7 @@ def demo_page(slug, name, route, fit, article):
 <p><button class="btn" id="cp" onclick="cp()">复制这个演示到公众号</button> <span id="msg" style="color:var(--accent)"></span></p>
 <h3 style="margin-top:40px">想用这个模板做你自己的内容</h3>
 <p>把仓库交给你的 AI agent（Claude Code、Codex、Cursor……），说：</p>
-<pre id="ask" style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px;font-size:14px">用 {REPO} 的「{escape(route)}」给我做一篇公众号 SVG 动效长图，题材是：____，资料在：____</pre>
+<pre id="ask" style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px;font-size:14px">用 {REPO} 的「{escape(route)}」{f"（照 {escape(sb_path)} 改）" if sb_path else ""}给我做一篇公众号 SVG 动效长图，题材是：____，资料在：____</pre>
 <p><button class="btn ghost" onclick="cpText()">复制这句话</button> <a class="btn ghost" href="{REPO}">去 GitHub</a></p>
 </div></div>
 <template id="src">{article.replace("</template", "<\\\\/template")}</template>
@@ -110,6 +118,44 @@ function cp(){{copyHtml(src,()=>msg.textContent='已复制，去公众号编辑�
 function cpText(){{navigator.clipboard.writeText(document.getElementById('ask').textContent);msg.textContent='已复制这句话';}}
 if(innerWidth<900)document.getElementById('g').style.gridTemplateColumns='1fr';
 replay();</script>""" + "<div class='wrap'>" + FOOT + "</div></body></html>"
+
+
+def case_page(c, article):
+    title = f"{c['title']} · {c['product']} · 小耳公众号SVG 真实作品"
+    desc = f"{c['product']}：{c['desc']}。用小耳公众号SVG 做的真实公众号动效长图。"
+    return head(title, desc, f"/work/{c['slug']}/") + NAV + f"""
+<div class="wrap" style="display:grid;grid-template-columns:400px 1fr;gap:48px;padding-top:36px;align-items:start" id="g">
+<div><div class="phone"><div class="screen" id="screen"><h1>{escape(c['title'])}</h1><div class="meta">真实作品 · 动画从打开那一刻开始</div><div id="art"></div></div></div>
+<p style="text-align:center"><button class="btn ghost" onclick="replay()">重播</button></p></div>
+<div><div class="mono">REAL WORK · {escape(c['product'])}</div><h2 style="font-size:34px;margin:6px 0 10px">{escape(c['title'])}</h2>
+<p style="color:var(--muted);font-size:17px">{escape(c['desc'])}</p>
+<p>这是小耳自己的产品，文章原样放在这里，和发进公众号的是同一份。</p>
+<p>{f'<a class="btn" href="{escape(c["link"])}">去看{escape(c["product"])}</a> ' if c.get("link") else ""}<a class="btn ghost" href="/#templates">用模板做你自己的</a></p>
+</div></div>
+<template id="src">{article.replace("</template", "<\\\\/template")}</template>
+<script>const src=document.getElementById('src').innerHTML.trim();
+function replay(){{const a=document.getElementById('art');a.innerHTML='';document.getElementById('screen').scrollTop=0;requestAnimationFrame(()=>a.innerHTML=src);}}
+if(innerWidth<900)document.getElementById('g').style.gridTemplateColumns='1fr';
+replay();</script>""" + "<div class='wrap'>" + FOOT + "</div></body></html>"
+
+
+def cases_section(cases):
+    if not cases:
+        return ""
+    def card(c):
+        if c.get("status") == "soon":
+            return f"""<div style="background:#fff;border:1px dashed var(--line);border-radius:10px;overflow:hidden">
+<div style="aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;background:var(--paper);color:var(--muted);font-size:15px">制作中</div>
+<div style="padding:14px 16px 18px"><div class="mono">{escape(c['product'])}</div><div style="font-size:19px;font-weight:700;margin:4px 0">{escape(c['title'])}</div>
+<div style="color:var(--muted);font-size:14px">{escape(c['desc'])}</div></div></div>"""
+        return f"""<a href="/work/{c['slug']}/" style="text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;display:block">
+<img src="/work/{c['slug']}/thumb.jpg" alt="{escape(c['title'])} 截图" loading="lazy" style="display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;background:#eee">
+<div style="padding:14px 16px 18px"><div class="mono">{escape(c['product'])}</div><div style="font-size:19px;font-weight:700;margin:4px 0">{escape(c['title'])}</div>
+<div style="color:var(--muted);font-size:14px">{escape(c['desc'])}</div></div></a>"""
+    return f"""<div class="wrap" id="works" style="padding-top:80px"><div class="mono">REAL WORK</div><h2 style="font-size:34px;margin:6px 0 8px">真实作品</h2>
+<p style="color:var(--muted);margin:0 0 24px">小耳自己的产品，用这套工具做的真实公众号文章。</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px">{"".join(card(c) for c in cases)}</div></div>
+"""
 
 
 def paste_page():
@@ -152,7 +198,7 @@ fromHash();
 </script>""" + "<div class='wrap'>" + FOOT + "</div></body></html>"
 
 
-def index_page(cards, hero_article):
+def index_page(cards, hero_article, cases=()):
     title = "小耳公众号SVG：让公众号文章自己动起来 · 免费开源 · Xiaoer Omia"
     desc = "纯 SVG 公众号动效长图：往下拉一屏屏长出来，线稿自己画、数字滚动、等轴测 3D 小场景一块块拼起来。没有视频和代码，公众号原生支持。交给你的 AI agent 就能做，一键复制到公众号。"
     ld = json.dumps({"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "小耳公众号SVG（xiaoer-wx-svg）",
@@ -173,7 +219,7 @@ def index_page(cards, hero_article):
 <p><a class="btn" href="#start">开始用</a> <a class="btn ghost" href="#templates">看模板</a> <a class="btn ghost" href="{REPO}">GitHub</a></p></div>
 <div><div class="phone"><div class="screen" id="screen"><h1>一句话，走过小耳的四台电脑（3D版）</h1><div class="meta">真实演示 · 往下滑</div><div id="art"></div></div></div></div></div>
 
-<div class="wrap" id="start" style="padding-top:80px"><div class="mono">HOW</div><h2 style="font-size:34px;margin:6px 0 24px">三步</h2>
+{cases_section(cases)}<div class="wrap" id="start" style="padding-top:80px"><div class="mono">HOW</div><h2 style="font-size:34px;margin:6px 0 24px">三步</h2>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px" class="three">
 <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px"><b style="font-size:30px;color:var(--accent)">01</b><h3>把仓库交给 agent</h3>
 <pre id="ask" style="white-space:pre-wrap;font-size:13px;background:var(--paper);padding:10px;border-radius:6px">{escape(ask)}</pre><button class="btn ghost" onclick="navigator.clipboard.writeText(document.getElementById('ask').textContent);this.textContent='已复制'">复制这句话</button></div>
@@ -195,13 +241,31 @@ if(innerWidth<900){{document.getElementById('hero').style.gridTemplateColumns='1
 <div class="wrap">{FOOT}</div></body></html>"""
 
 
+def with_mmbiz(article, sbdir, assets):
+    """模板带本地图片时，演示页换成微信图床链接（模板文件夹里的 mmbiz.json）：页面能看，复制进公众号也不丢图。"""
+    if not assets:
+        return article
+    mp = sbdir / assets / "mmbiz.json"
+    if not mp.exists():
+        return article
+    pre = assets.rstrip("/") + "/"
+    for rel, url in json.loads(mp.read_text(encoding="utf-8")).items():
+        article = article.replace(f'href="{pre}{rel}"', f'href="{url}"')
+    return article
+
+
 async def thumbs(jobs):
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
         b = await p.chromium.launch()
         pg = await b.new_page(viewport={"width": 1080, "height": 1350})
-        for article, t, dest in jobs:
-            await pg.set_content(f'<body style="margin:0;width:1080px">{article}</body>')
+        tmp = Path(tempfile.mkdtemp()) / "thumb.html"
+        for article, t, dest, base in jobs:
+            # 临时页放系统临时目录，<base> 指回分镜目录，相对路径的图片才截得到
+            tmp.write_text(f'<!doctype html><base href="{Path(base).resolve().as_uri()}/"><body style="margin:0;width:1080px">{article}</body>',
+                           encoding="utf-8")
+            await pg.goto(tmp.as_uri())
+            await pg.wait_for_load_state("load")
             await pg.wait_for_timeout(300)
             await pg.evaluate(f"document.querySelectorAll('svg').forEach(s=>{{s.pauseAnimations();s.setCurrentTime({t})}})")
             await pg.wait_for_timeout(200)
@@ -218,17 +282,29 @@ def main():
     for slug, name, route, fit, cmd, outname, t in DEMOS:
         subprocess.run([sys.executable, *cmd], cwd=ROOT, check=True, capture_output=True)
         art = (OUT / outname / "article.html").read_text(encoding="utf-8")
+        sbdir = (ROOT / cmd[1]).parent
+        web = with_mmbiz(art, sbdir, json.loads((ROOT / cmd[1]).read_text(encoding="utf-8")).get("assets"))
         d = DIST / "t" / slug
         d.mkdir(parents=True)
-        (d / "index.html").write_text(demo_page(slug, name, route, fit, art), encoding="utf-8")
-        jobs.append((art, t, d / "thumb.jpg"))
+        (d / "index.html").write_text(demo_page(slug, name, route, fit, web, cmd[1]), encoding="utf-8")
+        jobs.append((art, t, d / "thumb.jpg", sbdir))
         cards.append((slug, name, route, fit))
         urls.append(f"/t/{slug}/")
         if slug == "isometric-journey":
             hero = art
+    cases = json.loads(Path(os.environ["WXSVG_CASES"]).read_text(encoding="utf-8")) if os.environ.get("WXSVG_CASES") else []
+    for c in cases:
+        if c.get("status") == "soon":
+            continue
+        art = Path(c["article"]).expanduser().read_text(encoding="utf-8")
+        d = DIST / "work" / c["slug"]
+        d.mkdir(parents=True)
+        (d / "index.html").write_text(case_page(c, art), encoding="utf-8")
+        jobs.append((art, c.get("t", 60), d / "thumb.jpg", Path(c["article"]).expanduser().parent))
+        urls.append(f"/work/{c['slug']}/")
     asyncio.run(thumbs(jobs))
     shutil.copy(DIST / "t" / "isometric-journey" / "thumb.jpg", DIST / "og.jpg")
-    (DIST / "index.html").write_text(index_page(cards, hero), encoding="utf-8")
+    (DIST / "index.html").write_text(index_page(cards, hero, cases), encoding="utf-8")
     (DIST / "paste" / "index.html").write_text(paste_page(), encoding="utf-8")
     (DIST / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
     (DIST / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'

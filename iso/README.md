@@ -85,6 +85,40 @@ MODELS["名字"] = 名字
 - 循环动画（闪、转、浮）的开始时间用 `b.live`，即上一个零件落地之后。
 - 积木在 `iso/isokit.py`：`box/slab`、`cylinder`、`ellipse_top`，以及 `drop/appear/blink/spin/bob`。
 
+## 带图片帧的产品故事（`iso/fm_models.py`）
+
+样例：`templates/storyboards/等轴测-小耳FM洗衣房.json`（小耳FM：把一首歌洗成一幅画）。适合手上有**真实 3D 资产或作品图**的产品：
+把产品网页里的 3D 模型、App 渲染出来的画逐帧截成 jpg，拼成会动的站点。
+
+```bash
+python3 iso/iso_journey.py templates/storyboards/等轴测-小耳FM洗衣房.json --grow --speed 0.8
+```
+
+在上面字段基础上多了：
+
+| 字段 | 作用 |
+|---|---|
+| `"palette": "fm"` | 奶油底 + 珊瑚红 |
+| `"assets": "文件夹名"` | 图片放在分镜旁边这个子文件夹里，分镜里只写相对路径（`washer/jpg/open.jpg`） |
+| `"legend": false` | 不显示右上角「N STOPS」和分类图例 |
+| `"prologue"` | 开场：`hello` 角色招呼 → `question` 几行大问题 → `glimpses` 左右交替的小画 + 一句话 → `so` / `so_say` → 可选 `why` / `why_say` 一问一答 |
+| `"gallery"` | 路走完后的晾衣绳：`works` 每幅 `{name, note, frames}`，三幅一根绳，画沿绳滑进来、夹子夹住、一直轻轻晃，夹好后逐帧显影；可选 `guess`（问题 + 点一下看答案，不点几秒后自动揭开）、`credit`、`outro_say` |
+| `"end": {"url": ["前段", "红色段", "后段"]}` | 结尾大网址，中间一段用强调色，下面一道短线 |
+
+站点模型（`model` 填这些名字）：
+
+| 模型 | 用途 | 主要参数 |
+|---|---|---|
+| `fm_washer` | 能点的一站：`cover` 帧循环 + 「点一下」药丸，点了（或 `auto` 秒后）换成 `wash` | `cover`, `wash`, `hint`, `say`, `aspect` |
+| `fm_frames` | 一串帧循环或播一次（洗衣机转） | `frames`, `mode: loop/once`, `step`, `stay`, `say` |
+| `fm_done` | 先停在 `still`，再把 `frames` 播一次停在最后一帧 | `frames`, `still`, `dur`, `say` |
+| `fm_paint` | 带画框的一幅画，逐帧长出来 | `frames`, `dur`, `name`, `say` |
+
+`say` 是旁边角色的一句话泡泡。角色是 `head/jpg/look_00..15.jpg` 16 帧循环摇头，点一下会弹一下；换成你自己的角色就换这 16 张图。
+帧图建议：站点 560 宽 jpg（底色铺成和 `bg` 一样，阴影边缘羽化），画 450×600，每张十几 KB。整篇 129 张图约 3.4MB，正文 HTML 不到 200KB。
+
+`--push` 会先把所有相对路径图片传到你公众号的图床（`media/uploadimg`），缓存在 `out/<分镜名>/mmbiz.json`，再换链接推草稿；推送版另存 `article.mmbiz.html`。
+
 ## 公众号实测（2026-11-02）
 
 推草稿再拉回来比对：`transform="matrix(...)"`（贴面用）45/45 保留，animate 533/533，animateTransform 106/106，

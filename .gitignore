@@ -8,3 +8,4 @@ mmbiz.json
 *.otf
 site/.vercel/
 site/dist/
+!templates/storyboards/**/mmbiz.json

@@ -22,6 +22,7 @@ sys.path[:0] = [str(HERE), str(ROOT), str(ROOT / "motion")]
 import wxsvg  # noqa: E402
 from isokit import C, EASE, Iso, appear, f, ft, shade  # noqa: E402
 from models import MODELS, Builder  # noqa: E402
+import fm_models  # noqa: E402,F401  序章 / 晾衣绳画廊 / 帧序列站点（小耳FM 洗衣房模板）
 
 W = 1080
 CN = "PingFang SC,Noto Sans CJK SC,Microsoft YaHei,sans-serif"
@@ -33,6 +34,11 @@ PALETTES = {
                   plinth_top="#F8F4EB", leaf="#7FA36A", trunk="#8A6A4A", paver="#E9E2D2", metal="#C9CED1",
                   screen="#22313A", dark="#3A4650", wood="#C59A6A", pillar="#D9D2C3", mug="#D9452B", red="#D9452B",
                   kinds=["#2F6D6A", "#4B8EA0", "#8A9A5B", "#B07D3E", "#C4553D", "#6D5D9A", "#3F7FB8", "#9A6B4F"]),
+    "fm": dict(bg="#ECE4D5", ink="#2E2A26", muted="#8A7F73", rule="#D8CCB9", road="#E2D7C4", curb="#D3C6B1",
+               dash="#F7F2E8", card="#FBF7F0", cardline="#E0D5C3", shadow="#DFD3C0", plinth="#E6DCCB",
+               plinth_top="#F3EDE2", leaf="#A9B48F", trunk="#8A6A4A", paver="#E9E0D0", metal="#D8D0C2",
+               screen="#47413A", dark="#3A332C", wood="#C9A27A", pillar="#DCD1BF", mug="#D0664E", red="#D0664E",
+               kinds=["#D0664E", "#BE4F39", "#C9785F", "#A8573F", "#D0664E", "#BE4F39", "#C9785F", "#A8573F"]),
     "night": dict(bg="#141A1F", ink="#E9EEF0", muted="#8A979E", rule="#2C3740", road="#26313A", curb="#1B242B",
                   dash="#5B6B76", card="#1D262D", cardline="#2F3B44", shadow="#0E1317", plinth="#2A353E",
                   plinth_top="#34414B", leaf="#5E8C6A", trunk="#6B5440", paver="#3B4852", metal="#8D99A3",
@@ -223,7 +229,12 @@ def build(sb, grow=False, lead=0.6):
     CW = 440
     card_h = [card(0, 0, CW, s, i + 1, "#000000", pal, 0)[1] for i, s in enumerate(stops)]
     nodes = []  # 每站底座地面中心（公路节点）；卡片长了站距跟着拉开
-    cy = HEAD + 300
+    pro = None
+    PRO_Y = HEAD - 30
+    if sb.get("prologue"):
+        pro = fm_models.prologue_block(sb["prologue"], PRO_Y, 1.4, pal)
+    off = (pro[1] - PRO_Y + 60) if pro else 0
+    cy = HEAD + 300 + off
     for i in range(n):
         cx = LX if i % 2 == 0 else RX
         if i:
@@ -244,25 +255,31 @@ def build(sb, grow=False, lead=0.6):
         hd.append(T(74, 306 + k * 38, ln, 25, pal["muted"], 400))
     for k, e in enumerate(hd):
         front.append(slide(e, t + k * 0.12, dy=18))
-    front.append(appear(T(1008, 156, f"{n:02d}", 104, shade(accent0, 1.75) if sb.get("palette", "paper") == "paper" else pal["rule"], 800, "end", MONO), 0.6, 0.6))
-    front.append(appear(T(1008, 198, "STOPS", 16, accent0, 600, "end", MONO, 2), 0.8))
+    show_legend = sb.get("legend", True)
+    if show_legend:
+        front.append(appear(T(1008, 156, f"{n:02d}", 104, shade(accent0, 1.75) if sb.get("palette", "paper") == "paper" else pal["rule"], 800, "end", MONO), 0.6, 0.6))
+        front.append(appear(T(1008, 198, "STOPS", 16, accent0, 600, "end", MONO, 2), 0.8))
     ry = 370 + 38 * max(0, len(wrap(sb.get("intro", ""), 25, 820)) - 1)
     front.append(f'<path d="M72 {f(ry)} H1008" stroke="{pal["rule"]}" stroke-width="1.5" stroke-dasharray="936" stroke-dashoffset="936">'
                  f'<animate attributeName="stroke-dashoffset" values="936;0" begin="0.7s" dur="0.9s" fill="freeze" {EASE}/></path>')
     lx = 74
-    for k, kd in enumerate(kinds):
+    for k, kd in enumerate(kinds if show_legend else []):
         g = f'<circle cx="{f(lx)}" cy="{f(ry + 40)}" r="6" fill="{kcol[kd]}"/>' + T(lx + 14, ry + 47, kd, 19, pal["muted"], 500)
         front.append(appear(g, 1.0 + k * 0.1))
         lx += 40 + sum(cw(c, 19) for c in kd) + 24
 
+    if pro:
+        front.append(pro[0])
+        if grow:
+            reveals.extend((round(max(0.0, tt), 3), yy) for tt, yy in pro[3])
     # ---- 起点
-    t_road = 1.4
+    t_road = pro[2] if pro else 1.4
     start = (nodes[0][0] + 330, nodes[0][1] - 330 * 0.5 / C)
     seg, L = road_leg([start, nodes[0]], t_road, 0.9, pal)
     back.append(seg)
     pill = (f'<rect x="{f(start[0] - 52)}" y="{f(start[1] - 50)}" width="104" height="34" rx="17" fill="{accent0}"/>'
             + T(start[0], start[1] - 27, sb.get("start_label", "START"), 15, "#FFFFFF", 700, "middle", MONO, 2))
-    front.append(slide(pill, 1.2, dy=-14))
+    front.append(slide(pill, t_road - 0.2, dy=-14))
     route = [(t_road, *start), (t_road + 0.9, *nodes[0])]
 
     # ---- 各站
@@ -309,6 +326,13 @@ def build(sb, grow=False, lead=0.6):
     front.append(slide(end_pill, t_end, dy=-10))
     end = sb.get("end", {})
     ty = ey + 130
+    t_gal = t_end
+    if sb.get("gallery"):
+        part, ty, t_gal = fm_models.gallery_block(sb["gallery"], ey + 110, t_end + 0.4, pal)
+        front.append(part)
+        if grow:
+            reveals.append((round(max(0.0, t_end - lead), 3), int(ty + 200)))
+        ty += 90
     fe = []
     if end.get("title"):
         for k, ln in enumerate(wrap(end["title"], 52, 900)):
@@ -317,9 +341,17 @@ def build(sb, grow=False, lead=0.6):
     for k, ln in enumerate(end.get("lines", [])):
         fe.append(T(W / 2, ty + 20 + k * 44, ln, 25, pal["muted"], 400, "middle"))
     ty += 20 + 44 * len(end.get("lines", []))
+    if end.get("url"):
+        # 大网址，中间一段用强调色，下面一条强调色短线
+        pre, mid_, post = end["url"]
+        tw = sum(cw(c, 64) for c in pre + mid_ + post)
+        fe.append(f'<text x="{f(W / 2)}" y="{f(ty + 70)}" font-size="64" font-weight="800" text-anchor="middle" font-family="{MONO}" '
+                  f'fill="{pal["ink"]}" letter-spacing="1">{escape(pre)}<tspan fill="{pal["red"]}">{escape(mid_)}</tspan>{escape(post)}</text>')
+        fe.append(f'<rect x="{f(W / 2 - 60)}" y="{f(ty + 100)}" width="120" height="6" rx="3" fill="{pal["red"]}"/>')
+        ty += 130
     for k, e in enumerate(fe):
-        front.append(slide(e, t_end + 0.4 + k * 0.15, dy=20))
-    t_out = t_end + 0.6 + 0.15 * len(fe)
+        front.append(slide(e, t_gal + 0.4 + k * 0.15, dy=20))
+    t_out = t_gal + 0.6 + 0.15 * len(fe)
     if sb.get("advice"):
         part, ty, t_out = advice_block(sb["advice"], ty + 110, t_out, pal, kcol, accent0)
         front.append(part)
@@ -345,7 +377,7 @@ def build(sb, grow=False, lead=0.6):
     spec = {"width": W, "height": H, "background": pal["bg"],
             "elements": [{"type": "raw", "svg": body}]}
     if grow:
-        first = min(H, nodes[0][1] + 420)
+        first = min(H, (PRO_Y + 700) if pro else nodes[0][1] + 420)
         spec["first_screen"] = first
         # wxsvg 的空画布宽度按「目标高 / 首屏高」算
         spec["reveals"] = [[t, y] for t, y in reveals if y > first]
@@ -353,7 +385,7 @@ def build(sb, grow=False, lead=0.6):
         spec["first_screen"] = H
     long_svg, article = wxsvg.build(spec)
     article += appendix_html(sb)
-    tl = {"stops": [{"title": s["title"], "start": round(t, 2)} for s, t in zip(stops, times)],
+    tl = {"stops": [{"title": s["title"], "start": round(t, 2), "y": nodes[i][1]} for i, (s, t) in enumerate(zip(stops, times))],
           "finish": round(t_end + 2.5, 2), "height": H}
     return long_svg, article, tl
 
@@ -450,7 +482,7 @@ def scale_times(html, k):
     return re.sub(r'dur="([0-9]*\.?[0-9]+)s"', lambda m: 'dur="' + num(m) + '"', html)
 
 
-def cover(long_svg, t, y_center, out_path):
+def cover(long_svg, t, y_center, out_path, base=None):
     """封面 900×383：1080 宽下跳到 t 秒，截以 y_center 为中心的一条横带（中间截图放系统临时目录）。"""
     import asyncio
     import tempfile
@@ -463,7 +495,14 @@ def cover(long_svg, t, y_center, out_path):
         async with async_playwright() as p:
             b = await p.chromium.launch()
             pg = await b.new_page(viewport={"width": 1080, "height": 1200}, device_scale_factor=1)
-            await pg.set_content(f'<!doctype html><body style="margin:0;width:1080px">{long_svg}</body>')
+            if base:  # 有相对路径图片：临时页放系统临时目录，<base> 指回分镜所在目录
+                tmp = png.parent / "cover.html"
+                tmp.write_text(f'<!doctype html><base href="{Path(base).resolve().as_uri()}/">'
+                               f'<body style="margin:0;width:1080px">{long_svg}</body>', encoding="utf-8")
+                await pg.goto(tmp.as_uri())
+                await pg.wait_for_load_state("load")
+            else:
+                await pg.set_content(f'<!doctype html><body style="margin:0;width:1080px">{long_svg}</body>')
             await pg.evaluate(f"document.querySelectorAll('svg').forEach(s=>{{s.pauseAnimations();s.setCurrentTime({t})}})")
             await pg.wait_for_timeout(200)
             await pg.screenshot(path=str(png), full_page=True,
@@ -485,6 +524,11 @@ def main():
     sbp = Path(a.storyboard)
     sb = json.loads(sbp.read_text(encoding="utf-8"))
     long_svg, article, tl = build(sb, grow=a.grow)
+    if sb.get("assets"):  # 图片放在分镜旁边的子文件夹里：相对路径统一加前缀
+        import re
+        pre = sb["assets"].rstrip("/") + "/"
+        fix = lambda h: re.sub(r'href="(?!https?:|data:|#|/)([^"]+\.(?:jpg|jpeg|png|gif))"', lambda m: f'href="{pre}{m.group(1)}"', h)
+        long_svg, article = fix(long_svg), fix(article)
     if a.speed != 1.0:
         long_svg, article = scale_times(long_svg, a.speed), scale_times(article, a.speed)
         for s in tl["stops"]:
@@ -495,13 +539,15 @@ def main():
     (out / "long.svg").write_text(long_svg, encoding="utf-8")
     (out / "article.html").write_text(article, encoding="utf-8")
     title = sb.get("title", sb["headline"])
-    (out / "preview.html").write_text(wxsvg.PREVIEW.format(title=escape(title),
-                                      article=article.replace("</template", "<\\/template")), encoding="utf-8")
+    prev = wxsvg.PREVIEW.format(title=escape(title), article=article.replace("</template", "<\\/template"))
+    if sbp.parent.resolve() != out:  # 图片路径相对分镜目录写的：预览页指回那里
+        prev = prev.replace("<head>", f'<head><base href="{sbp.parent.resolve().as_uri()}/">', 1)
+    (out / "preview.html").write_text(prev, encoding="utf-8")
     # 封面：第 2 站拼好时截一条
     k = min(1, len(tl["stops"]) - 1)
-    cy = HEAD + 300 + k * GAP
+    cy = tl["stops"][k].get("y", HEAD + 300 + k * GAP)
     try:
-        cover(long_svg, tl["stops"][k]["start"] + 2.6 * a.speed, cy - 40, out / "cover.jpg")
+        cover(long_svg, tl["stops"][k]["start"] + 2.6 * a.speed, cy - 40, out / "cover.jpg", base=sbp.parent)
     except Exception as e:  # 常见：没跑 python3 -m playwright install chromium
         print(f"⚠️ 封面没出成（{str(e).splitlines()[0][:80]}）。文章照常生成；要封面先跑 python3 -m playwright install chromium")
     kb = len(article.encode()) / 1024
@@ -514,6 +560,23 @@ def main():
         print("⚠️ 超过 1MB，公众号可能吃不下")
     if a.push or a.update:
         import wechat
+        import re
+        # 正文里的本地图（href="xx/yy.jpg"）→ 先传 mmbiz 再换链接，缓存在作品目录 mmbiz.json
+        rel = sorted(set(re.findall(r'href="(?!https?:|data:|#)([^"]+\.(?:jpg|jpeg|png|gif))"', article)))
+        if rel:
+            base = sbp.parent.resolve()
+            cache_p = out / "mmbiz.json"
+            cache = json.loads(cache_p.read_text()) if cache_p.exists() else {}
+            tok = wechat.token()
+            for n in rel:
+                key = f"{n}:{(base / n).stat().st_mtime_ns}"
+                if key not in cache:
+                    cache[key] = wechat.upload_image(tok, base / n)
+                    print("上传", n, flush=True)
+                    cache_p.write_text(json.dumps(cache, ensure_ascii=False, indent=1))
+                article = article.replace(f'href="{n}"', f'href="{cache[key]}"')
+            (out / "article.mmbiz.html").write_text(article, encoding="utf-8")
+            print(f"图片 {len(rel)} 张已换成 mmbiz")
         mid = wechat.save_draft(article, title, str(out / "cover.jpg"), sb.get("author", ""),
                                 sb.get("digest", ""), update=a.update)
         (out / "media_id.txt").write_text(mid, encoding="utf-8")
