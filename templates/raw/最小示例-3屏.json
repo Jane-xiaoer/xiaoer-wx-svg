@@ -1,0 +1,28 @@
+{
+  "title": "一封会自己长出来的信",
+  "width": 1080,
+  "height": 5760,
+  "first_screen": 1920,
+  "background": "#101014",
+  "reveals": [[6, 3840], [13, 5760]],
+  "reveal_dur": 0.8,
+  "elements": [
+    {"type": "circle", "x": 540, "y": 620, "r": 220, "fx": "draw", "at": 0.3, "dur": 1.6, "color": "#ffcf5a", "stroke_width": 6},
+    {"type": "circle", "x": 540, "y": 620, "r": 120, "fill": "#ffcf5a", "fx": "zoom", "at": 1.4, "dur": 0.8, "loop": "pulse", "loop_period": 2.4},
+    {"type": "text", "x": 540, "y": 1060, "text": "这一页没有一行代码在跑", "size": 64, "weight": 700, "fx": "rise", "at": 2.0},
+    {"type": "text", "x": 540, "y": 1180, "text": "它只是一张会按时间变化的图", "size": 40, "color": "#9a9aa8", "fx": "fade", "at": 2.8},
+    {"type": "line", "x1": 340, "y1": 1400, "x2": 740, "y2": 1400, "fx": "draw", "at": 3.6, "dur": 1.0, "color": "#ffcf5a"},
+    {"type": "text", "x": 540, "y": 1640, "text": "往下看 ↓", "size": 36, "color": "#ffcf5a", "fx": "fade", "at": 6.2, "loop": "float", "loop_period": 1.6},
+
+    {"type": "rect", "x": 140, "y": 2200, "w": 800, "h": 520, "radius": 32, "fx": "draw", "at": 6.6, "dur": 1.4, "color": "#5ad1ff", "stroke_width": 5},
+    {"type": "text", "x": 540, "y": 2420, "text": "第 6 秒，页面变长了", "size": 56, "weight": 700, "fx": "type", "at": 7.6, "step": 0.08},
+    {"type": "text", "x": 540, "y": 2540, "text": "下面那块透明画布变宽 → 高度跟着变大\n于是长图多露出一屏", "size": 34, "color": "#9a9aa8", "fx": "fade", "at": 9.2},
+    {"type": "path", "d": "M200 3200 C 400 2950, 680 3450, 880 3200", "fx": "draw", "at": 10.0, "dur": 1.6, "color": "#5ad1ff", "stroke_width": 6},
+    {"type": "circle", "x": 880, "y": 3200, "r": 18, "fill": "#5ad1ff", "fx": "zoom", "at": 11.5, "dur": 0.4},
+
+    {"type": "text", "x": 540, "y": 4300, "text": "第 13 秒，最后一屏", "size": 64, "weight": 700, "fx": "rise", "at": 13.6},
+    {"type": "rect", "x": 440, "y": 4560, "w": 200, "h": 200, "radius": 24, "fill": "#ff6b8b", "fx": "zoom", "at": 14.4, "loop": "spin", "loop_period": 6},
+    {"type": "text", "x": 540, "y": 5100, "text": "用一份 JSON 写出：\n第几秒 · 出现什么 · 怎么出现", "size": 40, "color": "#e8e8ee", "fx": "fade", "at": 15.4},
+    {"type": "text", "x": 540, "y": 5460, "text": "— 完 —", "size": 32, "color": "#666674", "fx": "fade", "at": 16.6}
+  ]
+}

@@ -1,0 +1,275 @@
+{
+  "title": "一句话，走过小耳的四台电脑（3D版）",
+  "digest": "往下拉，跟着光点走一遍：每台电脑什么配置、跑什么模型、干什么活；最后是我踩坑换来的 6 条建议和 8 个拿去就能用的工具。",
+  "palette": "paper",
+  "kicker": "XIAOER · FOUR MACHINES · ISOMETRIC",
+  "headline": "小耳的四台电脑（3D版）",
+  "subtitle": "一条路，走过 8 个站",
+  "intro": "随身的 M5、常开的 M2、带显卡的 Windows，还有一台 8GB 的旧 MacBook Air。本地放着十几个模型，分工明确。你说一句话，它先翻记忆，再交给本地大模型，要出画面就去显卡那台，最后推进草稿箱。往下拉，跟着光点走一遍。",
+  "start_label": "START",
+  "end_label": "DRAFT",
+  "stops": [
+    {
+      "kind": "记忆",
+      "title": "共享记忆",
+      "place": "四台电脑的 agent 共用一本账",
+      "body": "开工先搜一遍，按意思找，不按关键词。哪台电脑上的 agent 查实了什么结论，都存回这里，别的电脑马上搜得到。",
+      "specs": [
+        [
+          "住在",
+          "M2（唯一常开的那台），只在内网开放，带口令"
+        ],
+        [
+          "怎么用",
+          "一句原话丢进去，按意思搜出档案和结论"
+        ],
+        [
+          "谁在用",
+          "M5、M2、Windows 上的所有 agent"
+        ]
+      ],
+      "en": "SHARED MEMORY",
+      "model": "archive"
+    },
+    {
+      "kind": "大脑",
+      "title": "M5 · 随身主力",
+      "place": "本地大模型都在这台",
+      "body": "默认用 35B 的 MoE，每次只激活 3B，实测 20.6 tok/s，比 9B 还快。",
+      "specs": [
+        [
+          "配置",
+          "MacBook Pro · Apple M5 · 10 核 · 32GB 内存 · 1.8TB"
+        ],
+        [
+          "模型",
+          "Qwen3.6-35B-A3B（主力）、Qwen3.5 9B / 4B、Whisper large-v3-turbo、Gemma 4 31B、PaddleOCR v5、Hunyuan3D-2mini"
+        ],
+        [
+          "干活",
+          "写代码、本地对话、语音转写（全家只有这台有 Whisper）、识别文字、图生 3D"
+        ]
+      ],
+      "en": "LOCAL MODEL ON MLX",
+      "model": "laptop",
+      "args": {
+        "chip": "MLX"
+      }
+    },
+    {
+      "kind": "大脑",
+      "title": "11434 引导门",
+      "place": "ollama 的老地址，背后是 MLX",
+      "body": "任何 agent 照常喊 ollama，门把请求转给 MLX。内存一次只够一个模型，门会先停掉另一个再起。",
+      "specs": [
+        [
+          "切换",
+          "要哪个就停掉另一个再起，约 4 秒"
+        ],
+        [
+          "教训",
+          "两个模型并存会互相拖死：9B 从 14.1 掉到 2.0 tok/s"
+        ]
+      ],
+      "en": "THE GATE",
+      "model": "gate",
+      "args": {
+        "text": "11434"
+      }
+    },
+    {
+      "kind": "出图",
+      "title": "Windows · 显卡",
+      "place": "全家唯一一块 GPU",
+      "body": "Blender 渲染只放这台，M5 不渲染，只做合成。8GB 显存，出图、配音、文字三件事只能轮流来。",
+      "specs": [
+        [
+          "配置",
+          "Alienware 16X · Core Ultra 9 275HX · 24 核 · 32GB · RTX 5070 笔记本版 8GB 显存"
+        ],
+        [
+          "模型",
+          "IndexTTS2（配音）、FLUX.2 Klein 4B（出图）、Gemma 4 26B、Qwen3.5 9B"
+        ],
+        [
+          "干活",
+          "Blender 出帧、中文配音、本地出图"
+        ]
+      ],
+      "en": "RENDER NODE",
+      "model": "desktop",
+      "args": {
+        "tag": "RTX 5070"
+      }
+    },
+    {
+      "kind": "备机",
+      "title": "M2 · 常开",
+      "place": "隧道 11435 · 真 ollama",
+      "body": "M5 关机的时候，请求走隧道到 M2。9.9 tok/s，慢，但一直在。",
+      "specs": [
+        [
+          "配置",
+          "MacBook Pro · Apple M2 · 8 核 · 24GB 内存"
+        ],
+        [
+          "模型",
+          "Qwen3.5 9B、Qwen3-Embedding 0.6B（给记忆做向量）"
+        ],
+        [
+          "干活",
+          "共享记忆服务、对外检索、M5 关机时的备用大脑"
+        ]
+      ],
+      "en": "ALWAYS ON",
+      "model": "server"
+    },
+    {
+      "kind": "测试",
+      "title": "ML · 真机测试",
+      "place": "一台普通人的旧电脑",
+      "body": "老系统、小内存，专门拿来测 Omia 在普通人的电脑上跑不跑得动。",
+      "specs": [
+        [
+          "配置",
+          "MacBook Air · Intel i5 双核 · 8GB 内存 · macOS Ventura 13.4"
+        ],
+        [
+          "模型",
+          "不跑模型"
+        ],
+        [
+          "干活",
+          "Omia 真机测试、轻量自动化"
+        ]
+      ],
+      "en": "REAL DEVICE TEST",
+      "model": "checklist"
+    },
+    {
+      "kind": "出口",
+      "title": "一条出口线",
+      "place": "只走一家，不乱跳",
+      "body": "所有出网走同一个出口，两种协议互为备份。断了就去修它，不临时换别家。",
+      "en": "ONE WAY OUT",
+      "model": "antenna"
+    },
+    {
+      "kind": "草稿",
+      "title": "草稿箱",
+      "place": "推进去 ≠ 发出去",
+      "body": "做好的东西一键推进公众号草稿箱。发布那一下，永远是人自己点。",
+      "en": "DRAFT BOX",
+      "model": "mailbox",
+      "args": {
+        "flag": "草稿"
+      }
+    }
+  ],
+  "end": {
+    "title": "一句话，走完一圈",
+    "lines": [
+      "记忆 → 大脑 → 出图 → 备机 → 测试 → 出口 → 草稿",
+      "每一站都是一台真机器"
+    ]
+  },
+  "advice": {
+    "kicker": "IF YOU WANT ONE",
+    "title": "想自己搭一套？6 条建议",
+    "sub": "都是真踩过的坑，不是查来的。",
+    "items": [
+      [
+        "本地大模型先试 MoE",
+        "35B-A3B 每次只激活 3B，在 M5 上比 9B 还快。别只看参数大小。"
+      ],
+      [
+        "内存一次只放一个模型",
+        "两个并存会互相拖死：实测 9B 从 14.1 掉到 2.0 tok/s，swap 冲到 21.7G。"
+      ],
+      [
+        "给老地址装一道门",
+        "各种工具都认 ollama 的 11434，就让门接住再转给 MLX，不用一个个改配置。"
+      ],
+      [
+        "留一台常开的机器",
+        "记忆、检索放在常开那台。随身那台关机了，备用大脑还在，慢，但在。"
+      ],
+      [
+        "慢了先别怪模型",
+        "先查是不是有第二个模型在跑、提示词是不是太长。我有一次塞了 27000 token。"
+      ],
+      [
+        "显存小就排队",
+        "8GB 显存装不下所有东西：出图、配音、文字三件事轮流来，别同时开。"
+      ]
+    ]
+  },
+  "tools": {
+    "kicker": "TAKE IT",
+    "title": "拿去就能用",
+    "sub": "我放在 GitHub 上的工具，免费开源。GitHub 搜仓库名就能找到。",
+    "items": [
+      {
+        "name": "claude-skill-web-clone",
+        "tag": "★ 1089",
+        "kind": "Claude skill",
+        "repo": "github.com/Jane-xiaoer/claude-skill-web-clone",
+        "desc": "照着复刻任何网站的方法：先拿真源码，不抄 AI 编出来的代码。"
+      },
+      {
+        "name": "xiaoer-videolab",
+        "tag": "★ 609",
+        "kind": "Mac 工具",
+        "repo": "github.com/Jane-xiaoer/xiaoer-videolab",
+        "desc": "工具栏点一下，把当前网页的视频抓到本地，支持 1800 多个网站。"
+      },
+      {
+        "name": "paper-collage-ad-codex",
+        "tag": "★ 425",
+        "kind": "Codex skill",
+        "repo": "github.com/Jane-xiaoer/paper-collage-ad-codex",
+        "desc": "剪纸拼贴广告全流程，带本地 IndexTTS-2 声音克隆、动画和成片检查。"
+      },
+      {
+        "name": "claude-skill-video-transcribe",
+        "tag": "★ 233",
+        "kind": "Claude skill",
+        "repo": "github.com/Jane-xiaoer/claude-skill-video-transcribe",
+        "desc": "视频转文字：有字幕抓字幕，没字幕 AI 听写。YouTube、B 站、本地文件都行。"
+      },
+      {
+        "name": "x-fetcher",
+        "tag": "★ 166",
+        "kind": "Claude skill",
+        "repo": "github.com/Jane-xiaoer/x-fetcher",
+        "desc": "一个 skill 抓两个平台：X（推特）和微信公众号文章，扔链接就抓。"
+      },
+      {
+        "name": "smart-rename",
+        "tag": "★ 39",
+        "kind": "Mac 工具",
+        "repo": "github.com/Jane-xiaoer/smart-rename",
+        "desc": "Finder 里右键任何文件，AI 给它起一个看得懂的名字。"
+      },
+      {
+        "name": "claude-skill-xiaoer-upscale",
+        "tag": "★ 34",
+        "kind": "Claude skill",
+        "repo": "github.com/Jane-xiaoer/claude-skill-xiaoer-upscale",
+        "desc": "Mac 本地图片超分到 4K / 8K，离线、不要 key、不花钱。"
+      },
+      {
+        "name": "rewind-learning",
+        "tag": "★ 3",
+        "kind": "方法 · 教程",
+        "repo": "github.com/Jane-xiaoer/rewind-learning",
+        "desc": "倒带学习法：每做完一个 AI 项目，沉淀成 4 份教学材料。"
+      }
+    ],
+    "footnote": "全部在 github.com/Jane-xiaoer：43 个公开仓库，一共 3008 颗星（2026-11-02）。",
+    "appendix_title": "文中工具清单（可复制）"
+  },
+  "tail": [
+    "XIAOER · 公众号svg · 等轴测旅程模板"
+  ]
+}

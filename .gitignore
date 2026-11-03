@@ -1,0 +1,10 @@
+out/
+__pycache__/
+*.pyc
+.DS_Store
+media_id.txt
+mmbiz.json
+*.ttf
+*.otf
+site/.vercel/
+site/dist/
