@@ -500,7 +500,10 @@ def main():
     # 封面：第 2 站拼好时截一条
     k = min(1, len(tl["stops"]) - 1)
     cy = HEAD + 300 + k * GAP
-    cover(long_svg, tl["stops"][k]["start"] + 2.6 * a.speed, cy - 40, out / "cover.jpg")
+    try:
+        cover(long_svg, tl["stops"][k]["start"] + 2.6 * a.speed, cy - 40, out / "cover.jpg")
+    except Exception as e:  # 常见：没跑 python3 -m playwright install chromium
+        print(f"⚠️ 封面没出成（{str(e).splitlines()[0][:80]}）。文章照常生成；要封面先跑 python3 -m playwright install chromium")
     kb = len(article.encode()) / 1024
     tl["article_kb"] = round(kb, 1)
     (out / "timeline.json").write_text(json.dumps(tl, ensure_ascii=False, indent=1), encoding="utf-8")

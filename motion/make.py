@@ -86,8 +86,14 @@ def cover(sb, th, out):
             await pg.goto(page.resolve().as_uri())
             await pg.screenshot(path=str(out / "cover.jpg"), type="jpeg", quality=92)
             await b.close()
-    asyncio.run(shot())
-    page.unlink()
+    try:
+        asyncio.run(shot())
+    except Exception as e:  # 常见：没跑 python3 -m playwright install chromium
+        print(f"⚠️ 封面没出成（{str(e).splitlines()[0][:80]}）。文章照常生成；要封面先跑 "
+              "python3 -m playwright install chromium，或推送时 --cover 指定一张 900×383 的图")
+        return None
+    finally:
+        page.unlink(missing_ok=True)
     return out / "cover.jpg"
 
 
