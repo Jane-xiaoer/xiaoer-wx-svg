@@ -217,6 +217,7 @@ def card(x, y, w, stop, idx, color, pal, at):
 # ---------------------------------------------------------------- 组装
 
 def build(sb, grow=False, lead=0.6):
+    fm_models.HEAD_FRAMES[:] = sb.get("character") or fm_models.DEFAULT_HEAD  # 开场 / 泡泡旁边的角色
     pal = dict(PALETTES[sb.get("palette", "paper")])
     stops = sb["stops"]
     kinds = []

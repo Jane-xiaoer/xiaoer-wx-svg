@@ -124,7 +124,8 @@ def fm_paint(b, frames=(), dur=7.0, name="", say=""):
 
 # ---------------------------------------------------------------- 小耳（首页那颗戴耳机的头）+ 说话泡泡
 
-HEAD_FRAMES = [f"head/jpg/look_{i:02d}.jpg" for i in range(16)]
+HEAD_FRAMES = [f"head/jpg/look_{i:02d}.jpg" for i in range(16)]  # 分镜 "character": [帧, …] 可以换成你的角色（1 张也行）
+DEFAULT_HEAD = list(HEAD_FRAMES)
 CN = "PingFang SC,Noto Sans CJK SC,Microsoft YaHei,sans-serif"
 
 

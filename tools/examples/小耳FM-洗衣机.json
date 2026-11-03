@@ -1,0 +1,28 @@
+{
+ "url": "https://fm.xiaoercamera.xyz/",
+ "viewport": [1000, 900],
+ "webgl": true,
+ "element": "#washer3d",
+ "transparent": true,
+ "hide_others": true,
+ "patch_url": "**/fm.xiaoercamera.xyz/",
+ "patch": [
+  ["controls.minPolarAngle=0.5;", "controls.minPolarAngle=0.5; window.__wcam=camera; window.__wctl=controls;"],
+  ["setTimeout(finishWash,2600)", "setTimeout(finishWash,15000)"]
+ ],
+ "wait": 3000,
+ "camera": {"camera": "window.__wcam", "target": "window.__wctl.target", "controls": "window.__wctl",
+            "dir": [1, 0.816, 1], "dist": 26, "fov": 25, "shift": [-0.95, -0.3, 0]},
+ "probe": "JSON.stringify([__washer.state().washing, __washer.state().done])",
+ "steps": [
+  {"js": "document.getElementById('toUpload').click()", "wait": 800},
+  {"js": "__washerReset()", "wait": 300},
+  {"js": "@camera", "wait": 600},
+  {"shot": "closed"},
+  {"js": "__washer.open()", "wait": 1500}, {"shot": "open"},
+  {"js": "__washer.put({name:'你最爱的那首歌.mp3'})"},
+  {"seq": "put", "count": 8, "every": 150},
+  {"js": "__washerDemo()"},
+  {"seq": "seq", "seconds": 26}
+ ]
+}

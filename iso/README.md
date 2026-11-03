@@ -100,6 +100,7 @@ python3 iso/iso_journey.py templates/storyboards/等轴测-小耳FM洗衣房.jso
 |---|---|
 | `"palette": "fm"` | 奶油底 + 珊瑚红 |
 | `"assets": "文件夹名"` | 图片放在分镜旁边这个子文件夹里，分镜里只写相对路径（`washer/jpg/open.jpg`） |
+| `"character": ["role/a.jpg", …]` | 开场和泡泡旁边的角色：一组帧会循环（左右张望），1 张就是静止的；不填用小耳 |
 | `"legend": false` | 不显示右上角「N STOPS」和分类图例 |
 | `"prologue"` | 开场：`hello` 角色招呼 → `question` 几行大问题 → `glimpses` 左右交替的小画 + 一句话 → `so` / `so_say` → 可选 `why` / `why_say` 一问一答 |
 | `"gallery"` | 路走完后的晾衣绳：`works` 每幅 `{name, note, frames}`，三幅一根绳，画沿绳滑进来、夹子夹住、一直轻轻晃，夹好后逐帧显影；可选 `guess`（问题 + 点一下看答案，不点几秒后自动揭开）、`credit`、`outro_say` |
@@ -114,7 +115,7 @@ python3 iso/iso_journey.py templates/storyboards/等轴测-小耳FM洗衣房.jso
 | `fm_done` | 先停在 `still`，再把 `frames` 播一次停在最后一帧 | `frames`, `still`, `dur`, `say` |
 | `fm_paint` | 带画框的一幅画，逐帧长出来 | `frames`, `dur`, `name`, `say` |
 
-`say` 是旁边角色的一句话泡泡。角色是 `head/jpg/look_00..15.jpg` 16 帧循环摇头，点一下会弹一下；换成你自己的角色就换这 16 张图。
+`say` 是旁边角色的一句话泡泡。角色默认是 `head/jpg/look_00..15.jpg` 16 帧循环摇头，点一下会弹一下；用 `character` 换成你自己的（产品吉祥物、logo、产品本身都行）。
 帧图建议：站点 560 宽 jpg（底色铺成和 `bg` 一样，阴影边缘羽化），画 450×600，每张十几 KB。整篇 129 张图约 3.4MB，正文 HTML 不到 200KB。
 
 `--push` 会先把所有相对路径图片传到你公众号的图床（`media/uploadimg`），缓存在 `out/<分镜名>/mmbiz.json`，再换链接推草稿；推送版另存 `article.mmbiz.html`。
