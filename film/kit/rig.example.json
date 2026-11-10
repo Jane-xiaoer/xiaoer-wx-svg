@@ -1,0 +1,47 @@
+{
+  "name": "mascot",
+  "image": "assets/mascot_src.png",
+  "is_body": "(g > r + 12) & (g > b + 25)",
+  "eyes": [[85, 105], [154, 103]],
+  "body_thick": [78, 70],
+  "out_width": 228,
+  "parts": {
+    "earL":  {"mode": "color", "poly": [[30, 0], [78, 0], [78, 30], [62, 40], [46, 62], [30, 62]], "pivot": [56, 48], "thick": [10, 8], "z": 3},
+    "earR":  {"mode": "color", "poly": [[160, 0], [210, 0], [210, 60], [196, 60], [178, 38], [160, 28]], "pivot": [186, 46], "thick": [10, 8], "z": 3},
+    "armL":  {"mode": "cut", "poly": [[0, 166], [25, 163], [29, 200], [28, 242], [0, 242]], "pivot": [22, 172], "fill": "x >= 25", "thick": [16, 14], "z": 4},
+    "armR":  {"mode": "cut", "poly": [[240, 166], [215, 163], [211, 200], [212, 242], [240, 242]], "pivot": [218, 172], "fill": "x <= 215", "thick": [16, 14], "z": 4},
+    "footL": {"mode": "cut", "poly": [[22, 252], [60, 246], [84, 268], [84, 308], [22, 308]], "pivot": [70, 262], "fill": "(y <= 272) & (x >= 40)", "thick": [26, 22], "z": 18},
+    "footR": {"mode": "cut", "poly": [[218, 252], [180, 246], [156, 268], [156, 308], [218, 308]], "pivot": [170, 262], "fill": "(y <= 272) & (x <= 200)", "thick": [26, 22], "z": 18}
+  },
+  "actions": {
+    "idle": {"fps": 6, "frames": [
+      {"ry": 0,   "armL": 8,  "armR": 8},
+      {"ry": 10,  "rz": 1.2,  "armL": 12, "armR": 14, "earL": -18},
+      {"ry": 20,  "rz": 2.2,  "armL": 15, "armR": 16, "earL": 6, "blink": 1},
+      {"ry": 22,  "rz": 2.5,  "armL": 16, "armR": 14},
+      {"ry": 22,  "rz": 2.2,  "armL": 15, "armR": 10, "earL": -18},
+      {"ry": 12,  "rz": 1.2,  "armL": 12, "armR": 6,  "earL": -18},
+      {"ry": 0,   "armL": 8,  "armR": 2},
+      {"ry": -10, "rz": -1.2, "armL": 4,  "armR": 1,  "earR": -16},
+      {"ry": -20, "rz": -2.2, "armL": 1,  "armR": 2,  "earR": 6, "blink": 1},
+      {"ry": -22, "rz": -2.5, "armL": 0,  "armR": 5,  "earR": -16},
+      {"ry": -22, "rz": -2.2, "armL": 1,  "armR": 9,  "earR": -16},
+      {"ry": -10, "rz": -1.2, "armL": 4,  "armR": 12}
+    ]},
+    "talk": {"fps": 8, "frames": [
+      {"ry": -6, "rx": 9, "by": 0,  "sq": 0.02,  "armL": 8,  "armR": 8,  "earL": -4,  "earR": -4},
+      {"ry": -6, "rx": 9, "by": 12, "sq": -0.03, "armL": 20, "armR": 20, "earL": -24, "earR": -24},
+      {"ry": -6, "rx": 9, "by": 5,  "sq": 0.02,  "armL": 12, "armR": 12, "earL": 6,   "earR": 6},
+      {"ry": -6, "rx": 9, "by": 12, "sq": -0.03, "armL": 20, "armR": 20, "earL": -24, "earR": -24},
+      {"ry": -6, "rx": 9, "by": 5,  "sq": 0.02,  "armL": 12, "armR": 12, "earL": 6,   "earR": 6},
+      {"ry": -6, "rx": 9, "by": 0,  "sq": 0.02,  "armL": 8,  "armR": 8,  "earL": -4,  "earR": -4}
+    ]},
+    "stomp": {"fps": 12, "frames": [
+      {"rz": -7, "ry": -8, "sq": -0.02, "armL": 14, "armR": 14, "footL": 16, "earL": 4,   "earR": 4},
+      {"rz": 0,  "ry": -8, "sq": 0.05,  "armL": 14, "armR": 14, "earL": -14, "earR": -14},
+      {"rz": 7,  "ry": 8,  "sq": -0.02, "armL": 14, "armR": 14, "footR": 16, "earL": 4,   "earR": 4},
+      {"rz": 0,  "ry": 8,  "sq": 0.05,  "armL": 14, "armR": 14, "earL": -14, "earR": -14}
+    ]}
+  },
+  "stills": {"sleep": {"blink": 1, "earL": -48, "earR": -48, "sq": 0.02}}
+}

@@ -2,3 +2,5 @@ fonttools>=4.40
 pillow>=10
 certifi
 playwright>=1.40   # 可选：封面图和截帧检查
+numpy            # 片子改编（film/）要用
+scipy            # 可选：film/kit/character.py 的角色立体帧

@@ -27,13 +27,14 @@ agent 会问你题材、资料、选哪种形式，生成后自己截帧检查�
 
 发布永远由你自己点。
 
-## 三条路
+## 四条路
 
 | | 适合 | 入口 |
 |---|---|---|
 | **套模板** | 产品介绍、工具、方法论、日常稿 | `motion/make.py` + [`motion/STORYBOARD.md`](motion/STORYBOARD.md)（14 种场景、6 套配色） |
 | **等轴测旅程（3D）** | 流程、路线、链路、几站串起来的故事 | `iso/iso_journey.py` + [`iso/README.md`](iso/README.md) |
 | **品牌 VI 版** | 甲方给了 VI 的品牌稿 | `iso/vikit.py`（磨砂玻璃立板、清晰窗由虚到实、标尺测量线、VI 字体转曲） |
+| **片子改编（视频 → 长图）** | 已经有一支成片，想让它在公众号里打开就自己往下演 | [`film/README.md`](film/README.md)：七步流程 + 八份分步文档 + 自带工具包（`film/kit/starter.py` 不要素材就能跑通）。[成品在线看](https://svg.xiaoeromia.com/work/xiaoer-aka/) |
 
 分镜样例在 `templates/storyboards/`，找最像的一份改。
 

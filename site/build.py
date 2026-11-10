@@ -5,7 +5,8 @@
   WXSVG_CASES=cases.json python3 site/build.py   # 另加首页「真实作品」栏（作品文件不进仓库）
 
 cases.json：[{"slug","title","product","desc","article": 本地 article.html 路径, "t": 缩略图秒数,
-             "link": 产品网址, "status": "live" | "soon"}]，status=soon 的只显示「制作中」卡片。
+             "link": 产品网址, "status": "live" | "soon", "files": [要一起放进作品目录的附件路径]}]，
+             status=soon 的只显示「制作中」卡片。
 部署：Vercel 静态站，根目录 site/dist（自己部署也行，纯静态）。
 """
 import asyncio
@@ -299,6 +300,8 @@ def main():
         art = Path(c["article"]).expanduser().read_text(encoding="utf-8")
         d = DIST / "work" / c["slug"]
         d.mkdir(parents=True)
+        for fpath in c.get("files", []):          # 作品自带的附件（比如片尾的视频），原样放进作品目录
+            shutil.copy(Path(fpath).expanduser(), d / Path(fpath).name)
         (d / "index.html").write_text(case_page(c, art), encoding="utf-8")
         jobs.append((art, c.get("t", 60), d / "thumb.jpg", Path(c["article"]).expanduser().parent))
         urls.append(f"/work/{c['slug']}/")
@@ -316,6 +319,7 @@ def main():
 - 仓库与 Agent Skill：{REPO}（SKILL.md）
 - 粘贴台（一键复制到公众号编辑器，文章不上传）：{BASE}/paste/
 - 公众号 SVG 实测规矩（会被删什么、保留什么）：{REPO}/blob/main/docs/wechat-svg-rules.md
+- 片子改编（把一支成片改成打开就自己往下演的长图，含 iPhone 微信真机的坑、切片、角色立体帧）：{REPO}/tree/main/film
 - 模板：{", ".join(f"{n}（{BASE}/t/{s}/）" for s, n, _, _ in cards)}
 - 出品方：Xiaoer Omia（{OMIA}），一个窗口打开 150 多种文件的万能阅读器。
 """, encoding="utf-8")
